@@ -31,3 +31,11 @@ body {
     text-wrap: balance;
   }
 }
+
+.ae-drop-container {
+  @apply min-w-full flex flex-col items-center justify-center text-xl text-red-900 font-semibold
+}
+
+.ae-order-footer {
+  @apply text-red-900 text-xs min-w-full flex items-center justify-center py-1
+}
