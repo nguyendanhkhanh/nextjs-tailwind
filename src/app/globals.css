@@ -16,14 +16,31 @@
   }
 }
 
+/* Thiết lập màu và kiểu dáng cho thanh cuộn dọc */
+::-webkit-scrollbar {
+  width: 10px; /* Chiều rộng của thanh cuộn */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(240, 204, 204, 0.5); /* Màu nền của thanh cuộn */
+  border-radius: 5px; /* Bo tròn các góc của thanh cuộn */
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(231, 208, 208, 0.1); /* Màu nền của phần track */
+}
+
+/* Ẩn thanh cuộn khi không được sử dụng */
+::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+      
 }
 
 @layer utilities {
@@ -33,9 +50,41 @@ body {
 }
 
 .ae-drop-container {
-  @apply min-w-full flex flex-col items-center justify-center text-xl text-red-900 font-semibold
+  @apply min-w-full flex flex-col grow items-center justify-start text-red-900 font-semibold
 }
 
 .ae-order-footer {
   @apply text-red-900 text-xs min-w-full flex items-center justify-center py-1
+}
+
+/* countdown */
+.ae-countdown-container {
+  @apply bg-pink-200  rounded-lg  px-6 pt-3 pb-6 w-80 text-center text-xl
+}
+.ae-countdown-content {
+  @apply grid grid-flow-col gap-2 text-center auto-cols-max  place-content-center
+}
+
+.ae-countdown-item-container {
+  @apply flex flex-col p-2 min-w-12 text-gray-700 bg-white rounded-box text-left
+}
+
+.ae-countdown-time {
+  @apply font-sans text-3xl countdown
+}
+
+.ae-countdown-title {
+  @apply text-left text-sm
+}
+
+/* order */
+.order-img {
+  @apply w-48 h-64 object-cover rounded-sm
+}
+
+.ae-mini-cart-container {
+@apply fixed right-0 text-base text-xs flex flex-col items-end
+}
+.ae-mini-cart-content {
+  @apply flex flex-col text-base text-xs bg-pink-300 pl-4 pr-3 py-2 rounded-l-full
 }
