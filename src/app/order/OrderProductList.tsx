@@ -125,7 +125,7 @@ function OrderProductList(props: any) {
         ))}
       </div>
 
-      <button className="btn w-full my-2" onClick={() => onClickOrder(carts)}>
+      <button className="btn w-full my-2" onClick={() => onClickOrder(carts, totalPrice)}>
         Đặt hàng
         <HeartIcon className='w-4' />
         {/* <span className="loading loading-spinner w-4"></span> */}

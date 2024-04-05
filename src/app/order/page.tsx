@@ -8,16 +8,17 @@ import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
+import { toCurrency } from "@/lib/utils";
 
 export default function Home() {
 
   const [loading, setLoading] = useState(false)
   const [dialogConfirm, setDialogConfirm] = useState(false)
   const [carts, setCarts] = useState<any[]>([])
+  const [totalPrice, setTotalPrice] = useState(0)
   const cancelButtonRef = useRef(null)
 
-  const onOpenModalConfirm = (carts: CartType[]) => {
-    console.log(carts);
+  const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
     const cartsOrder = carts.filter(product => {
       const existUnit = product.units.find(u => u.quantity)
       return existUnit ? true : false
@@ -30,13 +31,15 @@ export default function Home() {
             id: prod.id,
             name: prod.name,
             unit: unit.code,
-            quantity: unit.quantity
+            quantity: unit.quantity,
+            price: prod.price,
           })
         }
       })
     })
     setCarts(cartsConvert)
     setDialogConfirm(true)
+    setTotalPrice(totalPrice)
   }
 
   return (
@@ -66,10 +69,10 @@ export default function Home() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4  w-[300px]">
-                    <div className="sm:flex sm:items-start">
-                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
+                  <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div className="">
+                      <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 ">
                         <img className="w-24" src="./logo-circle.svg" />
                       </div>
                       <div className="mt-2 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -79,10 +82,14 @@ export default function Home() {
                         <div className="mt-2 flex flex-col text-sm text-gray-500">
                           {carts.map((prod, i) => (
                             <div className="flex items-center justify-between" key={i}>
-                              <span >{prod.name + ' size ' + prod.unit}</span>
-                              <span className="font-semibold">{prod.quantity}</span>
+                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
+                              <span className="font-semibold ms-2">{toCurrency(prod.price * prod.quantity)}</span>
                             </div>
                           ))}
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="font-semibold">Tổng tiền:</span>
+                            <span className="font-semibold ms-2">{toCurrency(totalPrice)}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -104,7 +111,6 @@ export default function Home() {
 
 
       {/* Open the modal using document.getElementById('ID').showModal() method */}
-      <button className="btn" onClick={() => setDialogConfirm(true)}>open modal</button>
       {<div id="my_modal_1" className="modal" role="dialog">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Hello!</h3>
