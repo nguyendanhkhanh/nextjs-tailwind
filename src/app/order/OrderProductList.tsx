@@ -58,7 +58,7 @@ function OrderProductList(props: any) {
       id: '3',
       name: 'Cora cami top',
       price: 110000,
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5_3tD7vu_geLP9P77gV-ryle-hxo_IZr0jSDgbmxIif1ToKzT-1rBxvCYK47aES5wbY&usqp=CAU',
+      image: 'https://i.ibb.co/DtJPY14/SANDRA-TOP.png',
       units: [{ code: 'M' }, { code: 'L' }]
     },
     {

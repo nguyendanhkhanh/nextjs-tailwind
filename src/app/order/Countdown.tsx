@@ -48,7 +48,7 @@ export default function Countdown() {
   };
   const startCountDown = useCallback(() => {
     const customDate = new Date();
-    const date = new Date(2024, 4 - 1, 12, 21)
+    const date = new Date(2024, 5 - 1, 16, 21)
     // date.setHours(date.getHours() - 7)
     setInterval(() => {
       getTimeDifference(date.getTime());
@@ -60,7 +60,7 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-      <span className="">New drop 12/04 🌷🎀</span>
+      <span className="">New drop 16/05 🌷🎀</span>
       <div className="ae-countdown-content mt-4">
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">

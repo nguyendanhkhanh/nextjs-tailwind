@@ -18,16 +18,20 @@
 
 /* Thiết lập màu và kiểu dáng cho thanh cuộn dọc */
 ::-webkit-scrollbar {
-  width: 10px; /* Chiều rộng của thanh cuộn */
+  width: 10px;
+  /* Chiều rộng của thanh cuộn */
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(240, 204, 204, 0.5); /* Màu nền của thanh cuộn */
-  border-radius: 5px; /* Bo tròn các góc của thanh cuộn */
+  background-color: rgba(240, 204, 204, 0.5);
+  /* Màu nền của thanh cuộn */
+  border-radius: 5px;
+  /* Bo tròn các góc của thanh cuộn */
 }
 
 ::-webkit-scrollbar-track {
-  background-color: rgba(231, 208, 208, 0.1); /* Màu nền của phần track */
+  background-color: rgba(231, 208, 208, 0.1);
+  /* Màu nền của phần track */
 }
 
 /* Ẩn thanh cuộn khi không được sử dụng */
@@ -40,7 +44,7 @@ body {
   background: linear-gradient(to bottom,
       transparent,
       rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
-      
+
 }
 
 @layer utilities {
@@ -59,10 +63,11 @@ body {
 
 /* countdown */
 .ae-countdown-container {
-  @apply bg-pink-200  rounded-lg  px-6 pt-3 pb-6 w-80 text-center text-xl
+  @apply bg-pink-200 rounded-lg px-6 pt-3 pb-6 w-80 text-center text-xl
 }
+
 .ae-countdown-content {
-  @apply grid grid-flow-col gap-2 text-center auto-cols-max  place-content-center
+  @apply grid grid-flow-col gap-2 text-center auto-cols-max place-content-center
 }
 
 .ae-countdown-item-container {
@@ -83,8 +88,21 @@ body {
 }
 
 .ae-mini-cart-container {
-@apply fixed right-0 text-base text-xs flex flex-col items-end
+  @apply fixed right-0 text-base text-xs flex flex-col items-end
 }
+
 .ae-mini-cart-content {
   @apply flex flex-col text-base text-xs bg-pink-300 pl-4 pr-3 py-2 rounded-l-full
+}
+
+.ae-input {
+  @apply input mt-4 input-sm rounded-sm w-full
+}
+
+.ae-select {
+  @apply select mt-4 select-sm rounded-sm
+}
+
+.ae-textarea {
+  @apply textarea mt-4 textarea-sm rounded-sm w-full
 }
