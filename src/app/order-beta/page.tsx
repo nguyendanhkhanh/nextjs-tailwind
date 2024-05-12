@@ -83,10 +83,10 @@ export default function OrderBeta() {
     const res = await axios.get(HOST + '/api/product-beta?drop=4')
     console.log(res.data.data);
 
-    const data = res.data.data.map(p => {
+    const data = res.data.data.map((p: any) => {
       return {
         ...p,
-        units: p.units.map(u => ({
+        units: p.units.map((u: any) => ({
           ...u,
           buy: 0
         }))
@@ -95,25 +95,25 @@ export default function OrderBeta() {
     setProducts(data)
   }
 
-  const getOrder = async () => {
-    const res = await axios.get(HOST + 'api/order-beta')
-    const data = res.data.data.map(o => {
-      return {
-        ...o,
-        products: JSON.stringify(o.products.map(p => p.nameOrder))
-      }
-    })
+  // const getOrder = async () => {
+  //   const res = await axios.get(HOST + 'api/order-beta')
+  //   const data = res.data.data.map(o => {
+  //     return {
+  //       ...o,
+  //       products: JSON.stringify(o.products.map(p => p.nameOrder))
+  //     }
+  //   })
 
-    const csv = generateCsv(csvConfig)(data);
+  //   const csv = generateCsv(csvConfig)(data);
 
-    download(csvConfig)(csv)
+  //   download(csvConfig)(csv)
 
-    console.table(data);
+  //   console.table(data);
 
-  }
+  // }
 
   function onAdd(i: number, unitCode: string) {
-    const unit = products[i].units.find(u => u.code === unitCode)
+    const unit = products[i].units.find((u: any) => u.code === unitCode)
     if (unit) {
       unit.buy += 1
       setProducts(JSON.parse(JSON.stringify(products)))
@@ -121,7 +121,7 @@ export default function OrderBeta() {
   }
 
   function onSubtract(i: number, unitCode: string) {
-    const unit = products[i].units.find(u => u.code === unitCode)
+    const unit = products[i].units.find((u: any) => u.code === unitCode)
     if (unit) {
       unit.buy -= 1
       setProducts(JSON.parse(JSON.stringify(products)))
@@ -137,7 +137,7 @@ export default function OrderBeta() {
     let totalPriceProduct = 0
     const productList: any[] = []
     products.forEach(prod => {
-      prod.units.forEach(unit => {
+      prod.units.forEach((unit: any) => {
         totalProduct += unit.buy
         totalPriceProduct += unit.buy * prod.price
         if (unit.buy) {
@@ -205,8 +205,8 @@ export default function OrderBeta() {
             <img className='w-[150px] me-4' src={p.image} />
             <div className='flex flex-col justify-between'>
               <div>{p.name}
-                {p.units.map(u => (
-                  <div key={u.code} className='flex justify-between items-center' key={u.code}>
+                {p.units.map((u: any) => (
+                  <div key={u.code} className='flex justify-between items-center' >
                     <span className='me-3'>Size {u.code}</span>
                     <div className='flex items-center'>
                       <button className="btn btn-square btn-xs" onClick={() => onSubtract(i, u.code)}>
@@ -227,7 +227,7 @@ export default function OrderBeta() {
                 ))}
               </div>
               <div>Còn
-                {p.units.map(u => (<div key={u.code}>Size {u.code}: {u.quantity}</div>))}
+                {p.units.map((u: any) => (<div key={u.code}>Size {u.code}: {u.quantity}</div>))}
               </div>
             </div>
           </div>

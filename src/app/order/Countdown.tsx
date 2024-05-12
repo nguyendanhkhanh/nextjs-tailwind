@@ -7,53 +7,57 @@ export default function Countdown() {
     minutes: "00",
     seconds: "00",
   });
-  const getTimeDifference = (countDownTime: any) => {
-    const currentTime = new Date().getTime();
-    const timeDiffrence = countDownTime - currentTime;
-    let days =
-      Math.floor(timeDiffrence / (24 * 60 * 60 * 1000)) >= 10
-        ? Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))
-        : `0${Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))}`;
-    const hours =
-      Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)) >=
-        10
-        ? Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60))
-        : `0${Math.floor(
-          (timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)
-        )}`;
-    const minutes =
-      Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60)) >= 10
-        ? Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))
-        : `0${Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))}`;
-    const seconds =
-      Math.floor((timeDiffrence % (60 * 1000)) / 1000) >= 10
-        ? Math.floor((timeDiffrence % (60 * 1000)) / 1000)
-        : `0${Math.floor((timeDiffrence % (60 * 1000)) / 1000)}`;
-    if (timeDiffrence < 0) {
-      setCountDownTIme({
-        days: "00",
-        hours: "00",
-        minutes: "00",
-        seconds: "00",
-      });
-      clearInterval();
-    } else {
-      setCountDownTIme({
-        days: days,
-        hours: hours,
-        minutes: minutes,
-        seconds: seconds,
-      });
-    }
-  };
+
   const startCountDown = useCallback(() => {
     const customDate = new Date();
     const date = new Date(2024, 5 - 1, 16, 21)
     // date.setHours(date.getHours() - 7)
-    setInterval(() => {
-      getTimeDifference(date.getTime());
+    var intervalCoundown = setInterval(() => {
+      const countDownTime = date.getTime()
+      const currentTime = new Date().getTime();
+      const timeDiffrence = countDownTime - currentTime;
+      let days =
+        Math.floor(timeDiffrence / (24 * 60 * 60 * 1000)) >= 10
+          ? Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))
+          : `0${Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))}`;
+      const hours =
+        Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)) >=
+          10
+          ? Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60))
+          : `0${Math.floor(
+            (timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)
+          )}`;
+      const minutes =
+        Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60)) >= 10
+          ? Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))
+          : `0${Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))}`;
+      const seconds =
+        Math.floor((timeDiffrence % (60 * 1000)) / 1000) >= 10
+          ? Math.floor((timeDiffrence % (60 * 1000)) / 1000)
+          : `0${Math.floor((timeDiffrence % (60 * 1000)) / 1000)}`;
+      if (timeDiffrence < 0) {
+        setCountDownTIme({
+          days: "00",
+          hours: "00",
+          minutes: "00",
+          seconds: "00",
+        });
+        clearInterval(intervalCoundown);
+      } else {
+        setCountDownTIme({
+          days: days.toString(),
+          hours: hours.toString(),
+          minutes: minutes.toString(),
+          seconds: seconds.toString(),
+        });
+      }
     }, 1000);
   }, []);
+  
+  const getTimeDifference = (countDownTime: any) => {
+
+  };
+
   useEffect(() => {
     startCountDown();
   }, [startCountDown]);

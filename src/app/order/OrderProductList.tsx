@@ -1,15 +1,19 @@
+'use client'
+
 import React, { useEffect, useState } from 'react'
 import { PlusIcon, ArrowPathIcon, HeartIcon } from '@heroicons/react/20/solid'
 import ProductOrder from './ProductOrder'
 import { CartType, CartStorageType, ProductType } from '@/interface/Product'
 import { toCurrency } from '@/lib/utils'
 
+const ISSERVER = typeof window === "undefined";
+
 function OrderProductList(props: any) {
 
-  const {onClickOrder} = props
+  const { onClickOrder } = props
 
   const [products, setProducts] = useState<ProductType[]>([])
-  const [storageCart, setStorageCart] = useState<CartStorageType[]>(JSON.parse(localStorage.getItem('carts') || '[]'))
+  const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
   const [carts, setCarts] = useState<CartType[]>([])
   const [totalProduct, setTotalProduct] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
