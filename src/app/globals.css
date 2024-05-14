@@ -58,12 +58,12 @@ body {
 }
 
 .ae-order-footer {
-  @apply text-red-900 text-xs min-w-full flex items-center justify-center py-1
+  @apply  text-xs min-w-full flex flex-col items-center justify-center py-1 text-gray-900
 }
 
 /* countdown */
 .ae-countdown-container {
-  @apply bg-pink-200 rounded-lg px-6 pt-3 pb-6 w-80 text-center text-xl
+  @apply bg-white rounded-lg px-6 pt-3 pb-6 w-80 text-center text-xl text-gray-900
 }
 
 .ae-countdown-content {
@@ -71,11 +71,11 @@ body {
 }
 
 .ae-countdown-item-container {
-  @apply flex flex-col p-2 min-w-12 text-gray-700 bg-white rounded-box text-left
+  @apply flex flex-col px-2 min-w-12 text-gray-700 bg-white rounded-box text-left
 }
 
 .ae-countdown-time {
-  @apply font-sans text-3xl countdown
+  @apply font-sans text-2xl countdown
 }
 
 .ae-countdown-title {
@@ -96,7 +96,7 @@ body {
 }
 
 .ae-input {
-  @apply input mt-4 input-sm rounded-sm w-full
+  @apply input mt-4 input-sm rounded-sm w-full text-sm
 }
 
 .ae-select {
@@ -104,5 +104,5 @@ body {
 }
 
 .ae-textarea {
-  @apply textarea mt-4 textarea-sm rounded-sm w-full
+  @apply textarea textarea-sm rounded-sm w-full
 }

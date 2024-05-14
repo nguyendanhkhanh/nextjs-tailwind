@@ -23,7 +23,7 @@ function OrderProductList(props: any) {
       return
     }
 
-    let totalProduct = 0
+    let totalProd = 0
     let totalPrice = 0
     const cartsNotEmpty = carts.filter(product => {
       const existUnit = product.units.find(u => u.quantity)
@@ -31,11 +31,11 @@ function OrderProductList(props: any) {
     })
     carts.forEach(prod => {
       prod.units.forEach(unit => {
-        totalProduct += unit.quantity
+        totalProd += unit.quantity
         totalPrice += unit.quantity * prod.price
       })
     })
-    setTotalProduct(totalProduct)
+    setTotalProduct(totalProd)
     setTotalPrice(totalPrice)
 
     localStorage.setItem('carts', JSON.stringify(cartsNotEmpty.map(cart => ({
@@ -47,44 +47,44 @@ function OrderProductList(props: any) {
   useEffect(() => {
     setProducts([{
       id: '1',
-      name: 'Cami top trắng',
-      price: 99000,
-      image: 'https://product.hstatic.net/1000370106/product/libe-white_pointy_cami_top26.5_b3247c772a884aa9bdd911cd881665b0_master.jpeg',
+      name: 'Cherry top',
+      price: 270000,
+      image: 'https://i.ibb.co/YRWcvWf/432159730-930952155242894-7842094914078003532-n.jpg',
       units: [{ code: 'M' }, { code: 'L' }]
     }, {
       id: '2',
-      name: 'Cora cami top',
-      price: 110000,
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5_3tD7vu_geLP9P77gV-ryle-hxo_IZr0jSDgbmxIif1ToKzT-1rBxvCYK47aES5wbY&usqp=CAU',
+      name: 'Rossa top',
+      price: 235000,
+      image: 'https://i.ibb.co/Bj7CZNy/o-hoa-nh-1-size.jpg',
       units: [{ code: 'M' }, { code: 'L' }]
     },
     {
       id: '3',
-      name: 'Cora cami top',
-      price: 110000,
-      image: 'https://i.ibb.co/DtJPY14/SANDRA-TOP.png',
+      name: 'Doris top ngắn tay',
+      price: 230000,
+      image: 'https://i.ibb.co/yYbMmmH/o-doris-xanh.jpg',
       units: [{ code: 'M' }, { code: 'L' }]
     },
     {
       id: '4',
-      name: 'Cora cami top',
-      price: 110000,
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5_3tD7vu_geLP9P77gV-ryle-hxo_IZr0jSDgbmxIif1ToKzT-1rBxvCYK47aES5wbY&usqp=CAU',
-      units: [{ code: 'M' }]
+      name: 'Sarah',
+      price: 225000,
+      image: 'https://i.ibb.co/1njyxpQ/431835017-1437723856840282-7198374109524220768-n.jpg',
+      units: [{ code: 'M' }, { code: 'L' }]
     },
     {
       id: '5',
-      name: 'Cora cami top',
-      price: 110000,
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5_3tD7vu_geLP9P77gV-ryle-hxo_IZr0jSDgbmxIif1ToKzT-1rBxvCYK47aES5wbY&usqp=CAU',
+      name: 'Amelia Dollette',
+      price: 230000,
+      image: 'https://i.ibb.co/B3Ds9YV/o-s-c-caro.jpg',
       units: [{ code: 'M' }, { code: 'L' }]
     },
     {
       id: '6',
-      name: 'Cora cami top',
-      price: 110000,
-      image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ5_3tD7vu_geLP9P77gV-ryle-hxo_IZr0jSDgbmxIif1ToKzT-1rBxvCYK47aES5wbY&usqp=CAU',
-      units: [{ code: 'M' }]
+      name: 'Adela',
+      price: 240000,
+      image: 'https://i.ibb.co/PTrn5dL/o-th-boi.jpg',
+      units: [{ code: 'M' }, { code: 'L' }]
     }])
   }, [])
 
@@ -117,9 +117,9 @@ function OrderProductList(props: any) {
   }
 
   return (
-    <div className='mt-2 flex flex-col items-center px-2'>
+    <div className='mt-2 flex flex-col items-center px-2 text-gray-900'>
       <div className='flex flex-col items-center'>
-        <span className='text-lg'>Danh sách sản phẩm</span>
+        <span className='text-lg '>Danh sách sản phẩm</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
       </div>
 
@@ -129,13 +129,13 @@ function OrderProductList(props: any) {
         ))}
       </div>
 
-      <button className="btn w-full my-2" onClick={() => onClickOrder(carts, totalPrice)}>
+      <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}>
         Đặt hàng
         <HeartIcon className='w-4' />
         {/* <span className="loading loading-spinner w-4"></span> */}
       </button>
 
-      <div className='ae-mini-cart-container'>
+      {/* <div className='ae-mini-cart-container'>
         <div className='ae-mini-cart-content'>
           <span>Tổng số lượng: {totalProduct} sản phẩm</span>
           <span>Tổng giá trị: {toCurrency(totalPrice)} </span>
@@ -144,7 +144,7 @@ function OrderProductList(props: any) {
           Đặt lại
           <ArrowPathIcon className='mr-8 w-4' />
         </button>
-      </div>
+      </div> */}
 
     </div>
   )

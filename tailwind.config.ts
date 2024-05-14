@@ -13,7 +13,8 @@ const config: Config = {
         'base': "url('https://marketplace.canva.com/EAF5Wgpb4fQ/1/0/900w/canva-pastel-pink-simple-coquette-shiny-bow-pattern-phone-wallpaper-lTXdwVxIm9g.jpg')",
       },
       colors: {
-        'base': '#242757'
+        'base': '#242757',
+        'pink-150': '#fadce6'
       },
       keyFrames: {
         fadeIn: {
