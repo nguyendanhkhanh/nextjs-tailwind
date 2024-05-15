@@ -10,7 +10,7 @@ const ISSERVER = typeof window === "undefined";
 
 function OrderProductList(props: any) {
 
-  const { onClickOrder } = props
+  const { onClickOrder, onResetOrder, isDone } = props
 
   const [products, setProducts] = useState<ProductType[]>([])
   const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
@@ -97,6 +97,13 @@ function OrderProductList(props: any) {
       }
     }))
   }, [storageCart, products]);
+
+  useEffect(() => {
+    if (isDone) {
+      onResetCart()
+    }
+  }, [isDone])
+
 
   const onChangeQuantity = (id: string, unitCode: string, quantity: number) => {
     if (quantity < 0) quantity = 0

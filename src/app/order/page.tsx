@@ -8,26 +8,32 @@ import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
-import { calculateShip, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
+import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
 import { isFreeship } from "@/lib/common";
 import axios from "axios";
-import { HOST } from "@/lib/config";
+import { HOST, ISSERVER } from "@/lib/config";
 
 export default function Home() {
+
+  const divRef = useRef(null);
+  const bottomRef = useRef(null);
+
+  const [deviceCode, setDeviceCode] = useState('');
 
   const [loading, setLoading] = useState(false)
   const [dialogConfirm, setDialogConfirm] = useState(false)
   const [carts, setCarts] = useState<any[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
   const [totalPayment, setTotalPayment] = useState(0)
+  const [totalAmount, setTotalAmount] = useState(0)
   const [discountPercent, setDiscountPercent] = useState(0)
   const [discount, setDiscount] = useState(0)
   const [ship, setShip] = useState(0)
-  const [step2, setStep2] = useState(false)
+  const [deposite, setDeposite] = useState(0)
   const [step, setStep] = useState(0)
   const cancelButtonRef = useRef(null)
 
-  const [info, setInfo] = useState({
+  const [info, setInfo] = useState(!ISSERVER && localStorage.getItem('info') ? JSON.parse(localStorage.getItem('info') || '{}') : {
     ig: '',
     phone: '',
     name: '',
@@ -55,13 +61,87 @@ export default function Home() {
   const [payment, setPayment] = useState('ck')
   const [urlQr, setUrlQr] = useState('')
 
+  const [isDone, setIsDone] = useState(false)
+
+  useEffect(() => {
+    let storedDeviceCode = localStorage.getItem('deviceCode');
+    if (!storedDeviceCode) {
+      storedDeviceCode = generateRandomString(16);
+      localStorage.setItem('deviceCode', storedDeviceCode);
+    }
+    setDeviceCode(storedDeviceCode);
+  }, []);
+
   useEffect(() => {
     getAllAddress()
     return () => {
     }
   }, [])
 
+  useEffect(() => {
+    localStorage.setItem('info', JSON.stringify(info));
+    return () => {
+    }
+  }, [info.ig, info.phone, info.name, info.address, info.province.code, info.district.code, info.ward.code, info.address])
+
+  useEffect(() => {
+    checkPhone()
+    return () => {
+    }
+  }, [info.phone])
+
+  const checkPhone = async () => {
+    if (!validatePhone(info.phone)) {
+      setPhoneWarning('Hãy nhập SĐT đúng')
+      setDiscountPercent(0)
+    } else {
+      setPhoneWarning('')
+      const res = await axios.get(HOST + '/api/customer?phone=' + info.phone)
+      if (res.data.data) {
+        setDiscountPercent(res.data.data.discount)
+      } else {
+        setDiscountPercent(0)
+      }
+    }
+  }
+
+  useEffect(() => {
+    const p = provinces.find(it => it.code === info.province.code)
+    if (p) {
+      const districtList: any[] = []
+      p.children.forEach((it: string) => {
+        const dist = addressAll.districts[it]
+        districtList.push({
+          ...dist,
+          code: it
+        })
+      })
+      setDistricts(districtList)
+    }
+    return () => {
+    }
+  }, [provinces, info.province.code])
+
+  useEffect(() => {
+    const d = districts.find(it => it.code === info.district.code)
+    if (d) {
+      const wardList: any[] = []
+      d.children.forEach((it: string) => {
+        const w = addressAll.wards[it]
+        wardList.push({
+          ...w,
+          code: it
+        })
+      })
+      setWards(wardList)
+    }
+
+    return () => {
+    }
+  }, [districts, info.district.code])
+
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
+    setIsDone(false)
     const cartsOrder = carts.filter(product => {
       const existUnit = product.units.find(u => u.quantity)
       return existUnit ? true : false
@@ -84,32 +164,6 @@ export default function Home() {
     setStep(1)
     setDialogConfirm(true)
     setTotalPrice(totalPrice)
-  }
-
-  const nextStep = () => {
-    if (step === 2) {
-      if (!info.ig || !info.name || !info.phone || !info.province.code || !info.district.code || !info.ward.code || !info.address) {
-        return alert('Vui lòng điển đủ thông tin')
-      }
-      if (phoneWarning) {
-        return alert('Vui lòng nhập đúng số điện thoại')
-      }
-      let shipValue = calculateShip(info.province.code, payment, totalPrice)
-      setShip(shipValue)
-      let totalPriceAfterDiscount = totalPrice
-      let discountValue = 0
-      if (discountPercent) {
-        discountValue = totalPrice * discountPercent / 100
-        setDiscount(discountValue)
-        totalPriceAfterDiscount = totalPrice - discountValue
-      }
-      const totalPaymentValue = totalPriceAfterDiscount + ship
-      setTotalPayment(totalPaymentValue)
-
-      const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(totalPaymentValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2050k'}`
-      setUrlQr(url)
-    }
-    setStep(step + 1)
   }
 
   const getAllAddress = async () => {
@@ -136,38 +190,48 @@ export default function Home() {
 
   const setInfoPhone = async (value: string) => {
     setInfo({ ...info, phone: value })
-    if (!validatePhone(value)) {
-      setPhoneWarning('Hãy nhập SĐT đúng')
-      setDiscountPercent(0)
-    } else {
-      setPhoneWarning('')
-      const res = await axios.get(HOST + '/api/customer?phone=' + value)
-      if (res.data.data) {
-        setDiscountPercent(res.data.data.discount)
-      } else {
-        setDiscountPercent(0)
-      }
-    }
+    // if (!validatePhone(value)) {
+    //   setPhoneWarning('Hãy nhập SĐT đúng')
+    //   setDiscountPercent(0)
+    // } else {
+    //   setPhoneWarning('')
+    //   const res = await axios.get(HOST + '/api/customer?phone=' + value)
+    //   if (res.data.data) {
+    //     setDiscountPercent(res.data.data.discount)
+    //   } else {
+    //     setDiscountPercent(0)
+    //   }
+    // }
   }
 
   const updateProvince = (code: string) => {
     const p = provinces.find(it => it.code === code)
-    if (p) setInfo({
-      ...info,
-      province: {
-        code: p.code,
-        name: p.name
-      }
-    })
-    const districtList: any[] = []
-    p.children.forEach((it: string) => {
-      const dist = addressAll.districts[it]
-      districtList.push({
-        ...dist,
-        code: it
+    if (p) {
+      setInfo({
+        ...info,
+        province: {
+          code: p.code,
+          name: p.name
+        },
+        district: {
+          code: '',
+          name: ''
+        },
+        ward: {
+          code: '',
+          name: ''
+        }
       })
-    })
-    setDistricts(districtList)
+      // const districtList: any[] = []
+      // p.children.forEach((it: string) => {
+      //   const dist = addressAll.districts[it]
+      //   districtList.push({
+      //     ...dist,
+      //     code: it
+      //   })
+      // })
+      // setDistricts(districtList)
+    }
   }
 
   const updateDistrict = (code: string) => {
@@ -177,17 +241,21 @@ export default function Home() {
       district: {
         code: d.code,
         name: d.name
+      },
+      ward: {
+        code: '',
+        name: ''
       }
     })
-    const wardList: any[] = []
-    d.children.forEach((it: string) => {
-      const w = addressAll.wards[it]
-      wardList.push({
-        ...w,
-        code: it
-      })
-    })
-    setWards(wardList)
+    // const wardList: any[] = []
+    // d.children.forEach((it: string) => {
+    //   const w = addressAll.wards[it]
+    //   wardList.push({
+    //     ...w,
+    //     code: it
+    //   })
+    // })
+    // setWards(wardList)
   }
 
   const updateWard = (code: string) => {
@@ -199,6 +267,62 @@ export default function Home() {
         name: w.name
       }
     })
+  }
+
+
+  const nextStep = () => {
+
+    setTimeout(() => {
+      // if (bottomRef.current) {
+      //   bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      // }
+      if (divRef.current) {
+        const scrollPosition = divRef.current.scrollHeight - divRef.current.clientHeight - (step === 1 ? 20 : 40);
+        divRef.current.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+      }
+    }, 200);
+
+    if (step === 2) {
+      if (!info.ig || !info.name || !info.phone || !info.province.code || !info.district.code || !info.ward.code || !info.address) {
+        return alert('Vui lòng điển đủ thông tin')
+      }
+      if (phoneWarning) {
+        return alert('Vui lòng nhập đúng số điện thoại')
+      }
+      let shipValue = calculateShip(info.province.code, payment, totalPrice)
+      setShip(shipValue)
+      let totalPriceAfterDiscount = totalPrice
+      let discountValue = 0
+      if (discountPercent) {
+        discountValue = totalPrice * discountPercent / 100
+        setDiscount(discountValue)
+        totalPriceAfterDiscount = totalPrice - discountValue
+      }
+      let depositValue = 0
+      if (payment === 'cod' && totalPrice >= 600000) {
+        depositValue = 50000
+      }
+      setDeposite(depositValue)
+      const totalAmountValue = totalPriceAfterDiscount + shipValue
+      setTotalAmount(totalAmountValue)
+      const totalPaymentValue = totalAmountValue - depositValue
+      setTotalPayment(totalPaymentValue)
+
+      const bankValue = payment === 'ck' ? totalPaymentValue : depositValue
+
+      if (bankValue) {
+        const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(bankValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2050k'}`
+        setUrlQr(url)
+      }
+    }
+    setStep(step + 1)
+  }
+
+
+  const done = () => {
+    setDialogConfirm(false)
+    setIsDone(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   return (
@@ -216,6 +340,7 @@ export default function Home() {
       <div className="ae-drop-container mt-20">
         <Countdown />
         <OrderProductList
+          isDone={isDone}
           onClickOrder={onOpenModalConfirm} />
       </div>
 
@@ -235,7 +360,7 @@ export default function Home() {
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
-                  <div className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div ref={divRef} className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div className="">
                       <div className="mx-auto flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
                         <img className="w-20" src="./logo-circle.svg" />
@@ -251,10 +376,10 @@ export default function Home() {
                               <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
                             </div>
                           ))}
-                          {step === 3 && discount && <div className="flex items-center justify-between mt-1 italic">
+                          {step === 3 && discount ? <div className="flex items-center justify-between mt-1 italic">
                             <span className="font-semibold ">Giảm giá:</span>
                             <span className="font-semibold ms-2">- {toThousand(discount)}</span>
-                          </div>}
+                          </div> : <></>}
                           {step === 3 && <div className="flex items-center justify-between mt-1">
                             <span className="font-semibold">Phí ship:</span>
                             <span className="font-semibold ms-2">{toThousand(ship)}</span>
@@ -269,7 +394,7 @@ export default function Home() {
                             {step >= 3 &&
                               <>
                                 <span className="font-semibold">Tổng tiền:</span><br />
-                                <span className="font-semibold ms-2">{toThousand(totalPayment)}</span>
+                                <span className="font-semibold ms-2">{toThousand(totalAmount)}</span>
                               </>}
                           </div>
                           {step < 3 && <span className="text-mini italic text-start" >{isFreeship(totalPrice) ? '(freeship với đơn trên 800k)' : '(chưa gồm phí ship)'}</span>}
@@ -290,18 +415,30 @@ export default function Home() {
                               </div>
                               {step < 3 && <span className="text-mini italic text-start" >(tặng kèm với đơn trên 500k)</span>}
                             </>}
-
+                          {step === 3 && deposite ?
+                            <>
+                              <div className="flex items-center justify-between mt-1  text-warning">
+                                <span className="font-semibold">Cọc:</span>
+                                <span className="font-semibold ms-2">{toThousand(deposite)}</span>
+                              </div>
+                              <div className="flex items-center justify-between mt-1 text-success">
+                                <span className="font-semibold">Tổng tiền thanh toán COD:</span>
+                                <span className="font-semibold ms-2">{toThousand(totalPayment)}</span>
+                              </div>
+                            </>
+                            : <></>
+                          }
 
                           {/* <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span> */}
                         </div>
 
-                        {step === 3 && <div className="flex flex-col">
+                        {step === 3 && (payment === 'ck' || deposite) ? <div className="flex flex-col">
                           <Dialog.Title as="h3" className="font-semibold leading-6 mt-2 text-gray-500 flex justify-start">
-                            Thông tin chuyển khoản:
+                            {deposite ? 'Thông tin chuyển khoản cọc' : 'Thông tin chuyển khoản'}:
                           </Dialog.Title>
                           <span className="text-mini italic text-red-500 text-left">(Quét mã QR dưới để ck, sau khi ck babi nhớ chụp màn hình r gửi qua IG cho Amanda nha)</span>
                           <img src={urlQr} />
-                        </div>}
+                        </div> : <></>}
                       </div>}
                       {step == 2 && <div className="mt-2 text-center sm:mt-0 sm:text-left">
                         <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 mt-4">
@@ -377,10 +514,13 @@ export default function Home() {
                       </div>}
                       {step === 4 &&
                         <div>
-                          <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
-                            🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 12 tiếng, quá thời hạn Amanda xin phép hủy đơn nha
-                          </Dialog.Title>
-                          <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
+                          {(payment === 'ck' || deposite) && <>
+                            <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
+                              🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 12 tiếng, quá thời hạn Amanda xin phép hủy đơn nha
+                            </Dialog.Title>
+                            <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
+                          </>
+                          }
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
                             🎀 Tin nhắn xác nhận đơn đặt hàng thành công sẽ được Amanda gửi qua IG từ 6-12 tiếng
                           </Dialog.Title>
@@ -391,6 +531,7 @@ export default function Home() {
                         </div>
                       }
                     </div>
+                    <div ref={bottomRef} />
                   </div>
                   <div className="bg-white px-4 py-3 flex justify-between ">
                     {step < 4 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
@@ -405,9 +546,9 @@ export default function Home() {
                       Tiếp tục
                     </button>}
                     {step === 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
-                      Chuyển khoản
+                      {(payment === 'ck' || deposite) ? 'Đã chuyển khoản' : 'Xác nhận'}
                     </button>}
-                    {step === 4 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
+                    {step === 4 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => done()}>
                       Hoàn tất
                     </button>}
                   </div>
