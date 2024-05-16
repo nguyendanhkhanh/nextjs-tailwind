@@ -1,5 +1,5 @@
 export interface ProductType {
-  id: string
+  _id: string
   name: string
   units: {
     code: string
@@ -9,7 +9,7 @@ export interface ProductType {
 }
 
 export interface CartType {
-  id: string
+  _id: string
   name: string
   units: {
     code: string
@@ -20,13 +20,13 @@ export interface CartType {
 }
 
 export interface CartRequest {
-  id: string
+  _id: string
   unit: string
   quantity: number
 }
 
 export interface CartStorageType {
-  id: string
+  _id: string
   units: {
     code: string,
     quantity: number

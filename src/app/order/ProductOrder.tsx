@@ -6,17 +6,18 @@ import React from 'react'
 interface ProductOrderProps {
   product: CartType;
   onChangeQuantity: (id: string, unitCode: string, quantity: number) => void;
+  onUpdateQuantity: (id: string, unitCode: string, type: string, value: number) => void
 }
 
 function ProductOrder(props: ProductOrderProps) {
 
-  const { product, onChangeQuantity } = props
+  const { product, onChangeQuantity, onUpdateQuantity } = props
 
   function onAdd(unitCode: string) {
     const unit = product.units.find(u => u.code === unitCode)
     if (unit) {
       const qty = unit.quantity + 1
-      onChangeQuantity(product.id, unit.code, qty)
+      onChangeQuantity(product._id, unit.code, qty)
     }
   }
 
@@ -24,12 +25,16 @@ function ProductOrder(props: ProductOrderProps) {
     const unit = product.units.find(u => u.code === unitCode)
     if (unit) {
       const qty = unit.quantity - 1
-      onChangeQuantity(product.id, unit.code, qty)
+      onChangeQuantity(product._id, unit.code, qty)
     }
   }
 
   function onChangeUnitQty(e: any, unitCode: string) {
-    onChangeQuantity(product.id, unitCode, Number(e.target.value || 0))
+    let qty = Number(e.target.value || 0)
+    if (qty < 0) qty = 0
+    if (qty > 2) qty = 2
+    // onUpdateQuantity(product._id, unitCode, 'type', qty)
+    return
   }
 
   return (
@@ -45,14 +50,14 @@ function ProductOrder(props: ProductOrderProps) {
         <div className='flex justify-between items-center' key={u.code}>
           <span>Size {u.code}</span>
           <div className='flex items-center'>
-            <button className="btn btn-square btn-xs" onClick={() => onSubtract(u.code)}>
+            <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'subtract')}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
               </svg>
 
             </button>
-            <input type="text" placeholder="SL" className="input input-ghost input-sm rounded-sm w-10 mx-1 text-center" value={u.quantity} onChange={(e) => onChangeUnitQty(e, u.code)} />
-            <button className="btn btn-square btn-xs" onClick={() => onAdd(u.code)}>
+            <input type="text" placeholder="SL" readOnly className="input input-ghost input-sm rounded-sm w-10 mx-1 text-center" value={u.quantity} onChange={(e) => onChangeUnitQty(e, u.code)} />
+            <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'add')}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>

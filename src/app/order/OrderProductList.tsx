@@ -5,15 +5,18 @@ import { PlusIcon, ArrowPathIcon, HeartIcon } from '@heroicons/react/20/solid'
 import ProductOrder from './ProductOrder'
 import { CartType, CartStorageType, ProductType } from '@/interface/Product'
 import { toCurrency } from '@/lib/utils'
+import axios from 'axios'
+import { HOST } from '@/lib/config'
 
 const ISSERVER = typeof window === "undefined";
 
 function OrderProductList(props: any) {
 
-  const { onClickOrder, onResetOrder, isDone } = props
+  const { onClickOrder, onResetOrder, isDone, onChangeTotalProduct } = props
 
   const [products, setProducts] = useState<ProductType[]>([])
-  const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
+  // const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
+  const [storageCart, setStorageCart] = useState<CartStorageType[]>([])
   const [carts, setCarts] = useState<CartType[]>([])
   const [totalProduct, setTotalProduct] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
@@ -38,59 +41,22 @@ function OrderProductList(props: any) {
     setTotalProduct(totalProd)
     setTotalPrice(totalPrice)
 
-    localStorage.setItem('carts', JSON.stringify(cartsNotEmpty.map(cart => ({
-      id: cart.id,
-      units: cart.units
-    }))));
+    onChangeTotalProduct(totalProd)
+
+    // localStorage.setItem('carts', JSON.stringify(cartsNotEmpty.map(cart => ({
+    //   id: cart._id,
+    //   units: cart.units
+    // }))));
   }, [carts]);
 
   useEffect(() => {
-    setProducts([{
-      id: '1',
-      name: 'Cherry top',
-      price: 270000,
-      image: 'https://i.ibb.co/YRWcvWf/432159730-930952155242894-7842094914078003532-n.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    }, {
-      id: '2',
-      name: 'Rossa top',
-      price: 235000,
-      image: 'https://i.ibb.co/Bj7CZNy/o-hoa-nh-1-size.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    },
-    {
-      id: '3',
-      name: 'Doris top ngắn tay',
-      price: 230000,
-      image: 'https://i.ibb.co/yYbMmmH/o-doris-xanh.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    },
-    {
-      id: '4',
-      name: 'Sarah',
-      price: 225000,
-      image: 'https://i.ibb.co/1njyxpQ/431835017-1437723856840282-7198374109524220768-n.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    },
-    {
-      id: '5',
-      name: 'Amelia Dollette',
-      price: 230000,
-      image: 'https://i.ibb.co/B3Ds9YV/o-s-c-caro.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    },
-    {
-      id: '6',
-      name: 'Adela',
-      price: 240000,
-      image: 'https://i.ibb.co/PTrn5dL/o-th-boi.jpg',
-      units: [{ code: 'M' }, { code: 'L' }]
-    }])
+    getProduct()
+
   }, [])
 
   useEffect(() => {
     setCarts(products.map(p => {
-      const productInCart = storageCart.find(pc => pc.id === p.id)
+      const productInCart = storageCart.find(pc => pc._id === p._id)
       return {
         ...p,
         units: productInCart ? [...productInCart.units] : p.units.map(u => ({ ...u, quantity: 0 }))
@@ -104,12 +70,26 @@ function OrderProductList(props: any) {
     }
   }, [isDone])
 
+  const getProduct = async () => {
+    const res = await axios.get(HOST + '/api/product-beta?drop=5')
+    const data = res.data.data.map((p: any) => {
+      return {
+        ...p,
+        units: p.units.map((u: any) => ({
+          ...u,
+          buy: 0
+        }))
+      }
+    })
+    setProducts(data)
+  }
+
 
   const onChangeQuantity = (id: string, unitCode: string, quantity: number) => {
     if (quantity < 0) quantity = 0
     if (quantity > 2) quantity = 2
     setCarts(carts.map(product => {
-      if (product.id === id) {
+      if (product._id === id) {
         const unit = product.units.find(u => u.code === unitCode)
         if (unit) {
           unit.quantity = quantity
@@ -117,6 +97,30 @@ function OrderProductList(props: any) {
         return product
       } else return product
     }))
+  }
+
+  const onUpdateQuantity = (id: string, unitCode: string, type: string, value = 0) => {
+    const product = carts.find(p => p._id === id)
+    if (!product) return
+    const productQty = product.units.reduce(((acc, cur) => acc + cur.quantity), 0)
+
+    if (productQty >= 2) {
+      if (type === 'add') return //
+    }
+    if (productQty === 0) {
+      if (type === 'subtract') return
+    }
+    setCarts(carts.map(product => {
+      if (product._id === id) {
+        const unit = product.units.find(u => u.code === unitCode)
+        if (!unit || (type === 'subtract' && unit.quantity == 0)) {
+          return product
+        }
+        unit.quantity = type === 'add' ? unit.quantity + 1 : unit.quantity - 1
+        return product
+      } else return product
+    }))
+
   }
 
   const onResetCart = () => {
@@ -132,7 +136,7 @@ function OrderProductList(props: any) {
 
       <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
         {carts.map((c, i) => (
-          <ProductOrder key={i} product={c} onChangeQuantity={onChangeQuantity} />
+          <ProductOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantity} />
         ))}
       </div>
 

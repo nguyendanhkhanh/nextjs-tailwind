@@ -23,6 +23,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [dialogConfirm, setDialogConfirm] = useState(false)
   const [carts, setCarts] = useState<any[]>([])
+  const [totalProduct, setTotalProduct] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
   const [totalPayment, setTotalPayment] = useState(0)
   const [totalAmount, setTotalAmount] = useState(0)
@@ -64,6 +65,14 @@ export default function Home() {
   const [isDone, setIsDone] = useState(false)
 
   useEffect(() => {
+    getDeviceCode()
+
+    return () => {
+    }
+  }, [])
+
+
+  useEffect(() => {
     let storedDeviceCode = localStorage.getItem('deviceCode');
     if (!storedDeviceCode) {
       storedDeviceCode = generateRandomString(16);
@@ -85,7 +94,9 @@ export default function Home() {
   }, [info.ig, info.phone, info.name, info.address, info.province.code, info.district.code, info.ward.code, info.address])
 
   useEffect(() => {
-    checkPhone()
+    if (info.phone) {
+      checkPhone()
+    }
     return () => {
     }
   }, [info.phone])
@@ -140,6 +151,22 @@ export default function Home() {
     }
   }, [districts, info.district.code])
 
+
+  const getDeviceCode = async () => {
+    let storedDeviceCode: any = localStorage.getItem('deviceCode');
+    if (!storedDeviceCode) {
+      const res = await axios.get(HOST + '/api/order-beta/deviceCode')
+      console.log("🚀 ~ getDeviceCode ~ res:", res)
+      storedDeviceCode = res.data.data;
+      localStorage.setItem('deviceCode', storedDeviceCode);
+    } else {
+      await axios.get(HOST + `/api/order-beta/deviceCode?deviceCode=${storedDeviceCode}`)
+      // storedDeviceCode = res.data || generateRandomString(16);
+      // localStorage.setItem('deviceCode', storedDeviceCode);
+    }
+    setDeviceCode(storedDeviceCode);
+  }
+
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
     setIsDone(false)
     const cartsOrder = carts.filter(product => {
@@ -151,7 +178,7 @@ export default function Home() {
       prod.units.forEach(unit => {
         if (unit.quantity) {
           cartsConvert.push({
-            id: prod.id,
+            _id: prod._id,
             name: prod.name,
             unit: unit.code,
             quantity: unit.quantity,
@@ -314,10 +341,20 @@ export default function Home() {
         const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(bankValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2050k'}`
         setUrlQr(url)
       }
+
+      submitOrder() 
     }
     setStep(step + 1)
   }
 
+  const submitOrder = async () => {
+    console.log(carts);
+    await axios.post(HOST + '/api/order-beta', {
+      carts: carts,
+      info: info,
+      deviceCode: deviceCode
+    })
+  }
 
   const done = () => {
     setDialogConfirm(false)
@@ -332,7 +369,7 @@ export default function Home() {
         <img className="w-40" src="./logo-square.png" />
         <div className="relative mb-1">
           <ShoppingBagIcon className="h-6 w-6 gray-900" />
-          <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">3</div>
+          <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
         </div>
 
       </header>
@@ -341,7 +378,8 @@ export default function Home() {
         <Countdown />
         <OrderProductList
           isDone={isDone}
-          onClickOrder={onOpenModalConfirm} />
+          onClickOrder={onOpenModalConfirm}
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
