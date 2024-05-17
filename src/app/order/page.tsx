@@ -61,6 +61,7 @@ export default function Home() {
   const [wards, setWards] = useState<any[]>([])
   const [payment, setPayment] = useState('ck')
   const [urlQr, setUrlQr] = useState('')
+  const [cartId, setCartId] = useState('')
 
   const [isDone, setIsDone] = useState(false)
 
@@ -342,18 +343,33 @@ export default function Home() {
         setUrlQr(url)
       }
 
-      submitOrder() 
+      submitOrder()
     }
     setStep(step + 1)
   }
 
   const submitOrder = async () => {
-    console.log(carts);
-    await axios.post(HOST + '/api/order-beta', {
+    // await axios.post(HOST + '/api/order-beta', {
+    //   carts: carts,
+    //   info: info,
+    //   deviceCode: deviceCode
+    // })
+    console.log("🚀 ~ submitOrder ~ carts:", {
       carts: carts,
       info: info,
       deviceCode: deviceCode
     })
+
+
+    const res = await axios.post(HOST + '/api/order', {
+      carts: carts,
+      info: info,
+      deviceCode: deviceCode,
+      cartId: cartId
+    })
+    if (res.data.data) {
+      setCartId(res.data.data)
+    }
   }
 
   const done = () => {
@@ -489,7 +505,7 @@ export default function Home() {
                             ig: e.target.value
                           })} />
                           <input type="text" placeholder="Số điện thoại" className="ae-input" value={info.phone} onChange={(e) => setInfoPhone(e.target.value)} />
-                          {discountPercent ? <span className="text-mini italic text-start text-green-600" >(được giảm 5% feedback)</span> : <span></span>}
+                          {discountPercent ? <span className="text-mini italic text-start text-green-600" >(được giảm {discountPercent}% feedback)</span> : <span></span>}
                           {phoneWarning && <span className="text-mini italic text-start text-red-500" >{phoneWarning}</span>}
 
                           <input type="text" placeholder="Tên" className="ae-input" value={info.name} onChange={(e) => setInfo({
