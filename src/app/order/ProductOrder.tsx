@@ -1,15 +1,25 @@
 import { CartType } from '@/interface/Product';
+import eventEmitter from '@/lib/eventEmitter';
 import { toCurrency } from '@/lib/utils';
 import { MinusIcon, PlusIcon } from '@heroicons/react/20/solid'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 interface ProductOrderProps {
   product: CartType;
   onChangeQuantity: (id: string, unitCode: string, quantity: number) => void;
-  onUpdateQuantity: (id: string, unitCode: string, type: string, value: number) => void
+  onUpdateQuantity: (id: string, unitCode: string, type: string, value?: number) => void
 }
 
+
 function ProductOrder(props: ProductOrderProps) {
+
+
+  useEffect(() => {
+    eventEmitter.on('warning' + product._id, warning)
+    return () => {
+      eventEmitter.off('warning', warning)
+    }
+  }, [])
 
   const { product, onChangeQuantity, onUpdateQuantity } = props
 
@@ -36,6 +46,32 @@ function ProductOrder(props: ProductOrderProps) {
     // onUpdateQuantity(product._id, unitCode, 'type', qty)
     return
   }
+  function warning(id: string) {
+    console.log("🚀 ~ warning ~ id:", id)
+    // Tạo một phần tử mới
+    var textElement = document.createElement('div');
+    textElement.className = 'hiddenText';
+    textElement.textContent = 'Quá số lượng cho phép';
+
+    // Thêm phần tử vào container
+    var container = document.getElementById(id);
+    container.appendChild(textElement);
+
+    // Cho phần tử hiện ra từ dưới lên
+    setTimeout(function () {
+      textElement.classList.add('visibleText');
+    }, 10);
+
+    // Bắt đầu hiệu ứng mờ dần sau 1 giây
+    setTimeout(function () {
+      textElement.classList.add('fadingText');
+      // Xóa phần tử khỏi DOM sau khi hiệu ứng mờ dần kết thúc
+      setTimeout(function () {
+        container.removeChild(textElement);
+      }, 500); // Phải khớp với thời gian transition của opacity trong CSS
+    }, 1000);
+  }
+
 
   return (
     <div>
@@ -46,9 +82,9 @@ function ProductOrder(props: ProductOrderProps) {
           <span className='text-xs font-semibold'>{toCurrency(product.price)}</span>
         </div>
       </div>
-      {product.units.map(u => (
-        <div className='flex justify-between items-center' key={u.code}>
-          <span>Size {u.code}</span>
+      {product.units.map((u, idx) => (
+        <div id={product._id + u.code} className='flex justify-between items-center relative overflow-hidden h-[30px]' key={u.code}>
+          <span>{u.code ? 'Size' : 'SL'} {u.code}</span>
           {u.status !== 'soldout'
             ? <div className='flex items-center'>
               <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'subtract')}>
@@ -58,7 +94,9 @@ function ProductOrder(props: ProductOrderProps) {
 
               </button>
               <input type="text" placeholder="SL" readOnly className="input input-ghost input-sm rounded-sm w-10 mx-1 text-center" value={u.quantity} onChange={(e) => onChangeUnitQty(e, u.code)} />
-              <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'add')}>
+              <button className="btn btn-square btn-xs" onClick={() => {
+                onUpdateQuantity(product._id, u.code, 'add')
+              }}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                 </svg>

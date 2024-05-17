@@ -106,3 +106,22 @@ body {
 .ae-textarea {
   @apply textarea textarea-sm rounded-sm w-full
 }
+
+.hiddenText {
+  position: absolute;
+  right: 0;
+  bottom: -80%; 
+  color: red;
+  font-size: 12px;
+  transition: bottom 0.5s ease-in-out, opacity 0.5s ease-in-out;
+  opacity: 0;
+}
+
+.visibleText {
+  bottom: 8px;
+  opacity: 1;
+}
+
+.fadingText {
+  opacity: 0;
+}

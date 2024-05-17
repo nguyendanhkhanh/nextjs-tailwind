@@ -28,7 +28,7 @@ function OrderProductList(props: any) {
     return () => {
       eventEmitter.off('reloadProducts', reloadProducts);
     };
-  },[])
+  }, [])
 
   // useEffect(() => {
   //   eventEmitter.on('soldout', soldProducts);
@@ -128,7 +128,7 @@ function OrderProductList(props: any) {
     const productQty = product.units.reduce(((acc, cur) => acc + cur.quantity), 0)
 
     if (productQty >= 2) {
-      if (type === 'add') return //
+      if (type === 'add') return eventEmitter.emit('warning' + id, id + unitCode)
     }
     if (productQty === 0) {
       if (type === 'subtract') return

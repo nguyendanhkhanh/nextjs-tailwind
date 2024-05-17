@@ -5,7 +5,7 @@ import Countdown from "@/app/order/Countdown";
 import OrderProductList from "@/app/order/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
 import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
@@ -349,6 +349,11 @@ export default function Home() {
 
       submitOrder(shipValue, depositValue)
     }
+
+    if (step === 3) {
+      calculateOrder()
+    }
+
     setStep(step + 1)
   }
 
@@ -374,10 +379,30 @@ export default function Home() {
     }
   }
 
+  const calculateOrder = async () => {
+    // await axios.post(HOST + '/api/order/calculate', {
+    //   carts: carts,
+    //   info: info,
+    //   deviceCode: deviceCode,
+    //   cartId: cartId,
+    //   payment: payment,
+    // })
+  }
+
   const done = () => {
     setDialogConfirm(false)
     setIsDone(true)
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    location.reload()
+  }
+
+  const copy = () => {
+    const el = document.createElement("textarea");
+    el.value = '19037257529012';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
   }
 
   return (
@@ -493,7 +518,13 @@ export default function Home() {
                             {deposite ? 'Thông tin chuyển khoản cọc' : 'Thông tin chuyển khoản'}:
                           </Dialog.Title>
                           <span className="text-mini italic text-red-500 text-left">(Quét mã QR dưới để ck, sau khi ck babi nhớ chụp màn hình r gửi qua IG cho Amanda nha)</span>
-                          <img src={urlQr} />
+                          <img src={urlQr}
+                          />
+                          <div className="flex flex-1 items-center justify-center -mt-5">
+                            <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
+                            <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={copy} />
+
+                          </div>
                         </div> : <></>}
                       </div>}
                       {step == 2 && <div className="mt-2 text-center sm:mt-0 sm:text-left">
@@ -570,12 +601,12 @@ export default function Home() {
                       </div>}
                       {step === 4 &&
                         <div>
-                          {(payment === 'ck' || deposite) && <>
+                          {(payment === 'ck' || deposite) ? <>
                             <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
                               🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 12 tiếng, quá thời hạn Amanda xin phép hủy đơn nha
                             </Dialog.Title>
                             <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
-                          </>
+                          </> : <></>
                           }
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
                             🎀 Tin nhắn xác nhận đơn đặt hàng thành công sẽ được Amanda gửi qua IG từ 6-12 tiếng
@@ -590,10 +621,10 @@ export default function Home() {
                     <div ref={bottomRef} />
                   </div>
 
-                  <div className="text-sm font-semibold text-gray-900">
+                  {/* <div className="text-sm font-semibold text-gray-900">
                     Sản phẩm đã hết:
                     {soldout.map(p => (<div>{p.name}</div>))}
-                  </div>
+                  </div> */}
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
                     {step < 4 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
