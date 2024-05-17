@@ -7,6 +7,7 @@ import { CartType, CartStorageType, ProductType } from '@/interface/Product'
 import { toCurrency } from '@/lib/utils'
 import axios from 'axios'
 import { HOST } from '@/lib/config'
+import eventEmitter from '@/lib/eventEmitter';
 
 const ISSERVER = typeof window === "undefined";
 
@@ -20,6 +21,29 @@ function OrderProductList(props: any) {
   const [carts, setCarts] = useState<CartType[]>([])
   const [totalProduct, setTotalProduct] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
+
+
+  useEffect(() => {
+    eventEmitter.on('reloadProducts', reloadProducts);
+    return () => {
+      eventEmitter.off('reloadProducts', reloadProducts);
+    };
+  },[])
+
+  // useEffect(() => {
+  //   eventEmitter.on('soldout', soldProducts);
+  //   return () => {
+  //     eventEmitter.off('soldout', soldProducts);
+  //   };
+  // },[])
+
+  // const soldProducts = (soldout: any[]) => {
+
+  // }
+
+  const reloadProducts = () => {
+    getProduct()
+  }
 
   useEffect(() => {
     if (!carts.length) {
@@ -51,12 +75,11 @@ function OrderProductList(props: any) {
 
   useEffect(() => {
     getProduct()
-
   }, [])
 
   useEffect(() => {
     setCarts(products.map(p => {
-      const productInCart = storageCart.find(pc => pc._id === p._id)
+      const productInCart = carts.find(pc => pc._id === p._id)
       return {
         ...p,
         units: productInCart ? [...productInCart.units] : p.units.map(u => ({ ...u, quantity: 0 }))

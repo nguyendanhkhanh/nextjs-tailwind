@@ -49,21 +49,23 @@ function ProductOrder(props: ProductOrderProps) {
       {product.units.map(u => (
         <div className='flex justify-between items-center' key={u.code}>
           <span>Size {u.code}</span>
-          <div className='flex items-center'>
-            <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'subtract')}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
-              </svg>
+          {u.status !== 'soldout'
+            ? <div className='flex items-center'>
+              <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'subtract')}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+                </svg>
 
-            </button>
-            <input type="text" placeholder="SL" readOnly className="input input-ghost input-sm rounded-sm w-10 mx-1 text-center" value={u.quantity} onChange={(e) => onChangeUnitQty(e, u.code)} />
-            <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'add')}>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
+              </button>
+              <input type="text" placeholder="SL" readOnly className="input input-ghost input-sm rounded-sm w-10 mx-1 text-center" value={u.quantity} onChange={(e) => onChangeUnitQty(e, u.code)} />
+              <button className="btn btn-square btn-xs" onClick={() => onUpdateQuantity(product._id, u.code, 'add')}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
 
-            </button>
-          </div>
+              </button>
+            </div>
+            : <div className='me-4 text-gray-600'>SOLD OUT</div>}
         </div>
       ))}
 

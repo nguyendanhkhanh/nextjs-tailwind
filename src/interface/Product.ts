@@ -3,6 +3,8 @@ export interface ProductType {
   name: string
   units: {
     code: string
+    quantity: number
+    status: string
   }[]
   price: number
   image: string
@@ -14,6 +16,7 @@ export interface CartType {
   units: {
     code: string
     quantity: number
+    status: string
   }[]
   price: number
   image: string
@@ -29,6 +32,7 @@ export interface CartStorageType {
   _id: string
   units: {
     code: string,
-    quantity: number
+    quantity: number,
+    status: string
   }[]
 }

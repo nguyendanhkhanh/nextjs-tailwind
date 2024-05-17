@@ -10,6 +10,7 @@ import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
 import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
 import { isFreeship } from "@/lib/common";
+import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
 
@@ -62,6 +63,9 @@ export default function Home() {
   const [payment, setPayment] = useState('ck')
   const [urlQr, setUrlQr] = useState('')
   const [cartId, setCartId] = useState('')
+
+  const [soldout, setSoldout] = useState([])
+
 
   const [isDone, setIsDone] = useState(false)
 
@@ -343,32 +347,30 @@ export default function Home() {
         setUrlQr(url)
       }
 
-      submitOrder()
+      submitOrder(shipValue, depositValue)
     }
     setStep(step + 1)
   }
 
-  const submitOrder = async () => {
-    // await axios.post(HOST + '/api/order-beta', {
-    //   carts: carts,
-    //   info: info,
-    //   deviceCode: deviceCode
-    // })
-    console.log("🚀 ~ submitOrder ~ carts:", {
-      carts: carts,
-      info: info,
-      deviceCode: deviceCode
-    })
-
+  const submitOrder = async (shipValue: number, depositValue: number) => {
+    // eventEmitter.emit('reloadProducts')
 
     const res = await axios.post(HOST + '/api/order', {
       carts: carts,
       info: info,
       deviceCode: deviceCode,
-      cartId: cartId
+      cartId: cartId,
+      ship: shipValue,
+      payment: payment,
+      deposite: depositValue
     })
-    if (res.data.data) {
-      setCartId(res.data.data)
+    const resp = res.data.data
+    // if (resp.soldoutList.length) {
+    //   setSoldout(resp.soldoutList)
+    //   eventEmitter.emit('soldout')
+    // }
+    if (resp.cartId) {
+      setCartId(resp.cartId)
     }
   }
 
@@ -587,6 +589,12 @@ export default function Home() {
                     </div>
                     <div ref={bottomRef} />
                   </div>
+
+                  <div className="text-sm font-semibold text-gray-900">
+                    Sản phẩm đã hết:
+                    {soldout.map(p => (<div>{p.name}</div>))}
+                  </div>
+
                   <div className="bg-white px-4 py-3 flex justify-between ">
                     {step < 4 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
                       if (step === 1) {
