@@ -380,13 +380,13 @@ export default function Home() {
   }
 
   const calculateOrder = async () => {
-    // await axios.post(HOST + '/api/order/calculate', {
-    //   carts: carts,
-    //   info: info,
-    //   deviceCode: deviceCode,
-    //   cartId: cartId,
-    //   payment: payment,
-    // })
+    await axios.post(HOST + '/api/order/calculate', {
+      carts: carts,
+      info: info,
+      deviceCode: deviceCode,
+      cartId: cartId,
+      payment: payment,
+    })
   }
 
   const done = () => {
