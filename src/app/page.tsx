@@ -1,8 +1,8 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/app/order/Countdown";
-import OrderProductList from "@/app/order/OrderProductList";
+import Countdown from "@/app/orderpongggao/Countdown";
+import OrderProductList from "@/app/orderpongggao/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
@@ -417,13 +417,13 @@ export default function Home() {
 
       </header>
 
-      <div className="ae-drop-container mt-20">
+      {/* <div className="ae-drop-container mt-20">
         <Countdown />
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
-      </div>
+      </div> */}
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
@@ -652,22 +652,6 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
-      {
-        <div id="my_modal_1" className="modal" role="dialog">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Hello!</h3>
-            <p className="py-4">Press ESC key or click the button below to close</p>
-            <div className="modal-action">
-              <form method="dialog">
-                {/* if there is a button in form, it will close the modal */}
-                <button className="btn">Close</button>
-              </form>
-            </div>
-          </div>
-        </div>
-      }
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">
