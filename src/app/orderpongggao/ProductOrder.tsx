@@ -13,7 +13,6 @@ interface ProductOrderProps {
 
 function ProductOrder(props: ProductOrderProps) {
 
-
   useEffect(() => {
     eventEmitter.on('warning' + product._id, warning)
     return () => {

@@ -13,10 +13,12 @@ import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
+import CountDownComplete from "@/components/CountDownComplete";
 
 export default function Home() {
 
   const divRef = useRef(null);
+  const containerRef = useRef(null);
   const bottomRef = useRef(null);
 
   const [deviceCode, setDeviceCode] = useState('');
@@ -34,6 +36,8 @@ export default function Home() {
   const [deposite, setDeposite] = useState(0)
   const [step, setStep] = useState(0)
   const cancelButtonRef = useRef(null)
+
+  const [startCountDown, setStartCountDown] = useState(false)
 
   const [info, setInfo] = useState(!ISSERVER && localStorage.getItem('info') ? JSON.parse(localStorage.getItem('info') || '{}') : {
     ig: '',
@@ -63,6 +67,8 @@ export default function Home() {
   const [payment, setPayment] = useState('ck')
   const [urlQr, setUrlQr] = useState('')
   const [cartId, setCartId] = useState('')
+  const cartIdRef = useRef(cartId);
+  const cartsRef = useRef(carts)
 
   const [soldout, setSoldout] = useState([])
 
@@ -75,6 +81,14 @@ export default function Home() {
     return () => {
     }
   }, [])
+
+  useEffect(() => {
+    cartIdRef.current = cartId; // Cập nhật giá trị ref mỗi khi state thay đổi
+  }, [cartId]);
+
+  useEffect(() => {
+    cartsRef.current = carts; // Cập nhật giá trị ref mỗi khi state thay đổi
+  }, [carts]);
 
 
   useEffect(() => {
@@ -105,6 +119,29 @@ export default function Home() {
     return () => {
     }
   }, [info.phone])
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", (ev) => {
+      handleOut()
+    });
+    return () => {
+      window.removeEventListener('beforeunload', () => { });
+    }
+  }, [])
+
+  const handleOut = () => {
+    const currentCartId = cartIdRef.current;
+    const currentCarts = cartsRef.current;
+    if (currentCarts.length && currentCartId) {
+      cancelOrder(currentCartId)
+      // Thực hiện hành động trước khi tab bị đóng
+      console.log("Tab trình duyệt sắp bị đóng");
+      // Hiển thị hộp thoại xác nhận (tùy thuộc vào trình duyệt)
+      const confirmationMessage = "Bạn có chắc chắn muốn rời khỏi trang này?";
+      event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+      return confirmationMessage; // Gecko, WebKit, Chrome <34
+    }
+  }
 
   const checkPhone = async () => {
     if (!validatePhone(info.phone)) {
@@ -161,7 +198,6 @@ export default function Home() {
     let storedDeviceCode: any = localStorage.getItem('deviceCode');
     if (!storedDeviceCode) {
       const res = await axios.get(HOST + '/api/order-beta/deviceCode')
-      console.log("🚀 ~ getDeviceCode ~ res:", res)
       storedDeviceCode = res.data.data;
       localStorage.setItem('deviceCode', storedDeviceCode);
     } else {
@@ -314,6 +350,11 @@ export default function Home() {
       }
     }, 200);
 
+    if (step === 1) {
+      setStep(step + 1)
+      setSoldout([])
+    }
+
     if (step === 2) {
       if (!info.ig || !info.name || !info.phone || !info.province.code || !info.district.code || !info.ward.code || !info.address) {
         return alert('Vui lòng điển đủ thông tin')
@@ -351,10 +392,11 @@ export default function Home() {
     }
 
     if (step === 3) {
-      calculateOrder()
+      // calculateOrder()
+      customerCompleteOrder()
+      setStep(step + 1)
     }
 
-    setStep(step + 1)
   }
 
   const submitOrder = async (shipValue: number, depositValue: number) => {
@@ -370,13 +412,40 @@ export default function Home() {
       deposite: depositValue
     })
     const resp = res.data.data
-    // if (resp.soldoutList.length) {
-    //   setSoldout(resp.soldoutList)
-    //   eventEmitter.emit('soldout')
-    // }
+    if (resp.soldoutList.length) {
+      setSoldout(resp.soldoutList)
+      const newCarts = carts.filter(c => {
+        const soldCart = resp.soldoutList.find(s => s._id === c._id)
+        if (soldCart) return false
+        return true
+      })
+      setCarts(newCarts)
+      let totalPrice = 0
+      newCarts.forEach(prod => {
+        totalPrice += prod.quantity * prod.price
+      })
+      setTotalPrice(totalPrice)
+      setStep(1)
+      eventEmitter.emit('soldout')
+    }
     if (resp.cartId) {
       setCartId(resp.cartId)
+      setStep(step + 1)
+      setStartCountDown(true)
+      setTimeout(() => {
+        cancelOrder(resp.cartId)
+        // }, 5 * 60 * 1000);
+      }, 10 * 1000);
     }
+  }
+
+  const cancelOrder = async (id: string) => {
+    if (id) {
+      await axios.post(HOST + '/api/order/cancel', {
+        cartId: id
+      })
+    }
+    location.reload()
   }
 
   const calculateOrder = async () => {
@@ -386,6 +455,12 @@ export default function Home() {
       deviceCode: deviceCode,
       cartId: cartId,
       payment: payment,
+    })
+  }
+
+  const customerCompleteOrder = async () => {
+    await axios.post(HOST + '/api/order/customerComplete', {
+      cartId: cartId
     })
   }
 
@@ -417,13 +492,13 @@ export default function Home() {
 
       </header>
 
-      {/* <div className="ae-drop-container mt-20">
+      <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
-      </div> */}
+      </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
@@ -446,6 +521,12 @@ export default function Home() {
                       <div className="mx-auto flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
                         <img className="w-20" src="./logo-circle.svg" />
                       </div>
+                      {startCountDown &&
+                        <>
+                          <CountDownComplete initialMinutes={5} />
+                          <span className="text-mini italic text-red-500 text-left">(Slot của nàng đã được giữ. Vui lòng hoàn tất bước này trong vòng 5 phút. Nếu chỉ tạo đơn thử, vui lòng bấm Hủy đơn để nhường slot cho người khác)</span>
+                        </>
+                      }
                       {step < 4 && <div className="mt-4 text-center sm:mt-0 sm:text-left">
                         <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
                           Amanda xác nhận đơn hàng nàng gồm có:
@@ -455,6 +536,11 @@ export default function Home() {
                             <div className="flex items-center justify-between" key={i}>
                               <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
                               <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
+                            </div>
+                          ))}
+                          {soldout.map((prod, i) => (
+                            <div className="flex items-center justify-between text-red-600" key={i}>
+                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(sold out)</span></span>
                             </div>
                           ))}
                           {step === 3 && discount ? <div className="flex items-center justify-between mt-1 italic">
@@ -627,13 +713,20 @@ export default function Home() {
                   </div> */}
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
-                    {step < 4 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
+                    {step < 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
                       if (step === 1) {
                         setDialogConfirm(false)
+                        setSoldout([])
+                        if (containerRef.current) {
+                          containerRef.current.scrollIntoView()
+                        }
                       }
                       setStep(step - 1)
                     }}>
                       Quay lại
+                    </button>}
+                    {step === 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => cancelOrder(cartId)}>
+                      Hủy đơn
                     </button>}
                     {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
                       Tiếp tục

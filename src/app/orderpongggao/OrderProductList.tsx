@@ -30,16 +30,16 @@ function OrderProductList(props: any) {
     };
   }, [])
 
-  // useEffect(() => {
-  //   eventEmitter.on('soldout', soldProducts);
-  //   return () => {
-  //     eventEmitter.off('soldout', soldProducts);
-  //   };
-  // },[])
+  useEffect(() => {
+    eventEmitter.on('soldout', reloadProducts);
+    return () => {
+      eventEmitter.off('soldout', reloadProducts);
+    };
+  }, [])
 
-  // const soldProducts = (soldout: any[]) => {
+  const soldProducts = (soldout: any[]) => {
 
-  // }
+  }
 
   const reloadProducts = () => {
     getProduct()
@@ -80,6 +80,19 @@ function OrderProductList(props: any) {
   useEffect(() => {
     setCarts(products.map(p => {
       const productInCart = carts.find(pc => pc._id === p._id)
+      if (productInCart) {
+        productInCart.units = productInCart.units.map(u => {
+          const unitInProducts = p.units.find(unitItem => unitItem.code === u.code)
+          if (unitInProducts) {
+            u.status = unitInProducts.status
+            if (unitInProducts.status === 'soldout') {
+              u.quantity = 0
+            }
+          }
+          return u
+        })
+        setCarts(carts)
+      }
       return {
         ...p,
         units: productInCart ? [...productInCart.units] : p.units.map(u => ({ ...u, quantity: 0 }))
@@ -127,7 +140,7 @@ function OrderProductList(props: any) {
     if (!product) return
     const productQty = product.units.reduce(((acc, cur) => acc + cur.quantity), 0)
 
-    if (productQty >= 2) {
+    if (productQty >= 1) {
       if (type === 'add') return eventEmitter.emit('warning' + id, id + unitCode)
     }
     if (productQty === 0) {
