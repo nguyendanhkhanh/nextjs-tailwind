@@ -1,8 +1,8 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/app/orderpongggao/Countdown";
-import OrderProductList from "@/app/orderpongggao/OrderProductList";
+import Countdown from "@/app/order-test/Countdown";
+import OrderProductList from "@/app/order-test/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
@@ -523,11 +523,11 @@ export default function Home() {
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
-        <Countdown />
+        {/* <Countdown />
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -775,7 +775,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      <Transition.Root show={orders.length ? true : false} as={Fragment}>
+      {/* <Transition.Root show={orders.length ? true : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 
@@ -832,7 +832,7 @@ export default function Home() {
             </div>
           </div>
         </Dialog>
-      </Transition.Root>
+      </Transition.Root> */}
 
 
       <footer className="ae-order-footer">

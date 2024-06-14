@@ -1,21 +1,25 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/app/orderpongggao/Countdown";
-import OrderProductList from "@/app/orderpongggao/OrderProductList";
+import Countdown from "@/app/order-test/Countdown";
+import OrderProductList from "@/app/order-test/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
 import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
 import { isFreeship } from "@/lib/common";
+import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
+import CountDownComplete from "@/components/CountDownComplete";
+import moment from 'moment'
 
 export default function Home() {
 
   const divRef = useRef(null);
+  const containerRef = useRef(null);
   const bottomRef = useRef(null);
 
   const [deviceCode, setDeviceCode] = useState('');
@@ -33,6 +37,8 @@ export default function Home() {
   const [deposite, setDeposite] = useState(0)
   const [step, setStep] = useState(0)
   const cancelButtonRef = useRef(null)
+
+  const [startCountDown, setStartCountDown] = useState(false)
 
   const [info, setInfo] = useState(!ISSERVER && localStorage.getItem('info') ? JSON.parse(localStorage.getItem('info') || '{}') : {
     ig: '',
@@ -62,8 +68,17 @@ export default function Home() {
   const [payment, setPayment] = useState('ck')
   const [urlQr, setUrlQr] = useState('')
   const [cartId, setCartId] = useState('')
+  const cartIdRef = useRef(cartId);
+  const cartsRef = useRef(carts)
+
+  const [soldout, setSoldout] = useState([])
+
 
   const [isDone, setIsDone] = useState(false)
+
+
+  const [orders, setOrders] = useState<any[]>([])
+
 
   useEffect(() => {
     getDeviceCode()
@@ -71,6 +86,14 @@ export default function Home() {
     return () => {
     }
   }, [])
+
+  useEffect(() => {
+    cartIdRef.current = cartId; // Cập nhật giá trị ref mỗi khi state thay đổi
+  }, [cartId]);
+
+  useEffect(() => {
+    cartsRef.current = carts; // Cập nhật giá trị ref mỗi khi state thay đổi
+  }, [carts]);
 
 
   useEffect(() => {
@@ -101,6 +124,29 @@ export default function Home() {
     return () => {
     }
   }, [info.phone])
+
+  useEffect(() => {
+    window.addEventListener("beforeunload", (ev) => {
+      handleOut()
+    });
+    return () => {
+      window.removeEventListener('beforeunload', () => { });
+    }
+  }, [])
+
+  const handleOut = () => {
+    const currentCartId = cartIdRef.current;
+    const currentCarts = cartsRef.current;
+    if (currentCarts.length && currentCartId) {
+      cancelOrder(currentCartId)
+      // Thực hiện hành động trước khi tab bị đóng
+      console.log("Tab trình duyệt sắp bị đóng");
+      // Hiển thị hộp thoại xác nhận (tùy thuộc vào trình duyệt)
+      const confirmationMessage = "Bạn có chắc chắn muốn rời khỏi trang này?";
+      event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+      return confirmationMessage; // Gecko, WebKit, Chrome <34
+    }
+  }
 
   const checkPhone = async () => {
     if (!validatePhone(info.phone)) {
@@ -157,7 +203,6 @@ export default function Home() {
     let storedDeviceCode: any = localStorage.getItem('deviceCode');
     if (!storedDeviceCode) {
       const res = await axios.get(HOST + '/api/order-beta/deviceCode')
-      console.log("🚀 ~ getDeviceCode ~ res:", res)
       storedDeviceCode = res.data.data;
       localStorage.setItem('deviceCode', storedDeviceCode);
     } else {
@@ -166,6 +211,20 @@ export default function Home() {
       // localStorage.setItem('deviceCode', storedDeviceCode);
     }
     setDeviceCode(storedDeviceCode);
+
+    getOrder(storedDeviceCode)
+  }
+
+  const getOrder = async (deviceCode: string) => {
+    const res = await axios.get(HOST + '/api/order/by-device?deviceCode=' + deviceCode)
+    console.log("🚀 ~ getOrder ~ res:", res.data.data)
+    const list =
+      res.data.data.map((ord, index) => ({
+        ...ord,
+        stt: index + 1
+      }))
+    list.reverse()
+    setOrders(list)
   }
 
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
@@ -310,6 +369,11 @@ export default function Home() {
       }
     }, 200);
 
+    if (step === 1) {
+      setStep(step + 1)
+      setSoldout([])
+    }
+
     if (step === 2) {
       if (!info.ig || !info.name || !info.phone || !info.province.code || !info.district.code || !info.ward.code || !info.address) {
         return alert('Vui lòng điển đủ thông tin')
@@ -343,39 +407,107 @@ export default function Home() {
         setUrlQr(url)
       }
 
-      submitOrder()
+      submitOrder(shipValue, depositValue)
     }
-    setStep(step + 1)
+
+    if (step === 3) {
+      // calculateOrder()
+      customerCompleteOrder()
+      setStep(step + 1)
+    }
+
   }
 
-  const submitOrder = async () => {
-    // await axios.post(HOST + '/api/order-beta', {
-    //   carts: carts,
-    //   info: info,
-    //   deviceCode: deviceCode
-    // })
-    console.log("🚀 ~ submitOrder ~ carts:", {
-      carts: carts,
-      info: info,
-      deviceCode: deviceCode
-    })
-
+  const submitOrder = async (shipValue: number, depositValue: number) => {
+    // eventEmitter.emit('reloadProducts')
 
     const res = await axios.post(HOST + '/api/order', {
       carts: carts,
       info: info,
       deviceCode: deviceCode,
+      cartId: cartId,
+      ship: shipValue,
+      payment: payment,
+      deposite: depositValue
+    })
+    const resp = res.data.data
+    if (resp.soldoutList.length) {
+      setSoldout(resp.soldoutList)
+      const newCarts = carts.filter(c => {
+        const soldCart = resp.soldoutList.find(s => s._id === c._id)
+        if (soldCart) return false
+        return true
+      })
+      setCarts(newCarts)
+      let totalPrice = 0
+      newCarts.forEach(prod => {
+        totalPrice += prod.quantity * prod.price
+      })
+      setTotalPrice(totalPrice)
+      setStep(1)
+      eventEmitter.emit('soldout')
+    }
+    if (resp.cartId) {
+      setCartId(resp.cartId)
+      setStep(step + 1)
+      setStartCountDown(true)
+      var timeoutCancel = setTimeout(() => {
+        cancelOrder(resp.cartId)
+      }, 5 * 60 * 1000);
+      // }, 10 * 1000);
+    }
+  }
+
+  const cancelOrder = async (id: string) => {
+    const currentCartId = cartIdRef.current;
+    const currentCarts = cartsRef.current;
+    if (currentCarts.length && currentCartId) {
+      setCarts([])
+      setCartId('')
+      if (id) {
+        await axios.post(HOST + '/api/order/cancel', {
+          cartId: id
+        })
+      }
+      setTimeout(() => {
+        location.reload()
+      }, 1000);
+    }
+  }
+
+  const calculateOrder = async () => {
+    await axios.post(HOST + '/api/order/calculate', {
+      carts: carts,
+      info: info,
+      deviceCode: deviceCode,
+      cartId: cartId,
+      payment: payment,
+    })
+  }
+
+  const customerCompleteOrder = async () => {
+    await axios.post(HOST + '/api/order/customer-complete', {
       cartId: cartId
     })
-    if (res.data.data) {
-      setCartId(res.data.data)
-    }
+    setCarts([])
+    setCartId('')
+    setStartCountDown(false)
   }
 
   const done = () => {
     setDialogConfirm(false)
     setIsDone(true)
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    location.reload()
+  }
+
+  const copy = () => {
+    const el = document.createElement("textarea");
+    el.value = '19037257529012';
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
   }
 
   return (
@@ -390,7 +522,7 @@ export default function Home() {
 
       </header>
 
-      <div className="ae-drop-container mt-20">
+      <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
         <OrderProductList
           isDone={isDone}
@@ -419,6 +551,12 @@ export default function Home() {
                       <div className="mx-auto flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
                         <img className="w-20" src="./logo-circle.svg" />
                       </div>
+                      {startCountDown && step === 3 &&
+                        <>
+                          <CountDownComplete initialMinutes={5} />
+                          <span className="text-mini italic text-red-500 text-left">(Slot của nàng đã được giữ. Vui lòng hoàn tất bước này trong vòng 5 phút. Nếu chỉ tạo đơn thử, vui lòng bấm Hủy đơn để nhường slot cho người khác)</span>
+                        </>
+                      }
                       {step < 4 && <div className="mt-4 text-center sm:mt-0 sm:text-left">
                         <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
                           Amanda xác nhận đơn hàng nàng gồm có:
@@ -428,6 +566,11 @@ export default function Home() {
                             <div className="flex items-center justify-between" key={i}>
                               <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
                               <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
+                            </div>
+                          ))}
+                          {soldout.map((prod, i) => (
+                            <div className="flex items-center justify-between text-red-600" key={i}>
+                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(sold out)</span></span>
                             </div>
                           ))}
                           {step === 3 && discount ? <div className="flex items-center justify-between mt-1 italic">
@@ -491,7 +634,13 @@ export default function Home() {
                             {deposite ? 'Thông tin chuyển khoản cọc' : 'Thông tin chuyển khoản'}:
                           </Dialog.Title>
                           <span className="text-mini italic text-red-500 text-left">(Quét mã QR dưới để ck, sau khi ck babi nhớ chụp màn hình r gửi qua IG cho Amanda nha)</span>
-                          <img src={urlQr} />
+                          <img src={urlQr}
+                          />
+                          <div className="flex flex-1 items-center justify-center -mt-5">
+                            <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
+                            <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={copy} />
+
+                          </div>
                         </div> : <></>}
                       </div>}
                       {step == 2 && <div className="mt-2 text-center sm:mt-0 sm:text-left">
@@ -568,12 +717,12 @@ export default function Home() {
                       </div>}
                       {step === 4 &&
                         <div>
-                          {(payment === 'ck' || deposite) && <>
+                          {(payment === 'ck' || deposite) ? <>
                             <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
                               🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 12 tiếng, quá thời hạn Amanda xin phép hủy đơn nha
                             </Dialog.Title>
                             <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
-                          </>
+                          </> : <></>
                           }
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
                             🎀 Tin nhắn xác nhận đơn đặt hàng thành công sẽ được Amanda gửi qua IG từ 6-12 tiếng
@@ -587,16 +736,29 @@ export default function Home() {
                     </div>
                     <div ref={bottomRef} />
                   </div>
+
+                  {/* <div className="text-sm font-semibold text-gray-900">
+                    Sản phẩm đã hết:
+                    {soldout.map(p => (<div>{p.name}</div>))}
+                  </div> */}
+
                   <div className="bg-white px-4 py-3 flex justify-between ">
-                    {step < 4 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
+                    {step < 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
                       if (step === 1) {
                         setDialogConfirm(false)
+                        setSoldout([])
+                        if (containerRef.current) {
+                          containerRef.current.scrollIntoView()
+                        }
                       }
                       setStep(step - 1)
                     }}>
                       Quay lại
                     </button>}
-                    {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
+                    {step === 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => cancelOrder(cartId)}>
+                      Hủy đơn
+                    </button>}
+                    {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" disabled={!carts.length} onClick={() => nextStep()}>
                       Tiếp tục
                     </button>}
                     {step === 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
@@ -613,22 +775,65 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
+      <Transition.Root show={orders.length ? true : false} as={Fragment}>
+        <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
+          <BackgroundModal />
 
-      {/* Open the modal using document.getElementById('ID').showModal() method */}
-      {
-        <div id="my_modal_1" className="modal" role="dialog">
-          <div className="modal-box">
-            <h3 className="font-bold text-lg">Hello!</h3>
-            <p className="py-4">Press ESC key or click the button below to close</p>
-            <div className="modal-action">
-              <form method="dialog">
-                {/* if there is a button in form, it will close the modal */}
-                <button className="btn">Close</button>
-              </form>
+          <div className="fixed top-[7vh] z-10 w-screen  overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
+                  <div ref={divRef} className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                      Nàng đang có {orders.length} đơn hàng:
+                    </Dialog.Title>
+                    {orders.map((order, index) => (<div className='mb-6 text-gray-900 mt-2 text-sm' key={order._id}>
+                      <div className="text-gray-600 text-sm italic">{moment(order.updateAt).format('DD/MM/YYYY HH:mm')}</div>
+                      <div className='flex '>
+                        <span className="text-md text-gray-900 font-semibold me-1">Người nhận: </span>
+                        <span className="text-center text-md text-gray-900">{order.info.name} - {order.info.phone}</span>
+                      </div>
+                      <div className='flex'>
+                        <span className="text-start text-md text-gray-900"><span className="font-semibold">Địa chỉ: </span>{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
+                      </div>
+                      {order.info.note
+                        ? <div className='flex mb-2'>
+                          <span className="text-start text-md text-gray-900"><span className="font-semibold">Note: </span>{order.info.note}</span>
+                        </div>
+                        : <></>
+                      }
+                      <span className="text-md text-gray-900 font-semibold me-1 ">Danh sách sản phẩm: </span>
+                      <div>{order.products.map(p => (
+                        <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
+                      ))}</div>
+                      <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
+                      <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}</div>
+                      <div>----------------------------------------------------</div>
+                    </div>))}
+
+                    <div className="text-center text-xs italic text-red-500">(Đây là đơn hàng đặt thử. Thông tin đơn hàng sẽ tự động xóa vào lúc 20h30)</div>
+                  </div>
+
+                  <div className="bg-white px-4 py-3 flex justify-between ">
+                    <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { if (orders.length < 2) setOrders([]) }}>
+                      Đồng ý
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
           </div>
-        </div>
-      }
+        </Dialog>
+      </Transition.Root>
+
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">
