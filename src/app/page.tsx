@@ -14,6 +14,7 @@ import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
 import CountDownComplete from "@/components/CountDownComplete";
+import moment from 'moment'
 
 export default function Home() {
 
@@ -74,6 +75,10 @@ export default function Home() {
 
 
   const [isDone, setIsDone] = useState(false)
+
+
+  const [orders, setOrders] = useState<any[]>([])
+  
 
   useEffect(() => {
     getDeviceCode()
@@ -206,6 +211,20 @@ export default function Home() {
       // localStorage.setItem('deviceCode', storedDeviceCode);
     }
     setDeviceCode(storedDeviceCode);
+
+    getOrder(storedDeviceCode)
+  }
+
+  const getOrder = async (deviceCode: string) => {
+    const res = await axios.get(HOST + '/api/order/by-device?deviceCode=' + deviceCode)
+    console.log("🚀 ~ getOrder ~ res:", res.data.data)
+    const list =
+      res.data.data.map((ord, index) => ({
+        ...ord,
+        stt: index + 1
+      }))
+    list.reverse()
+    setOrders(list)
   }
 
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
@@ -748,6 +767,67 @@ export default function Home() {
                     {step === 4 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => done()}>
                       Hoàn tất
                     </button>}
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition.Root>
+
+      <Transition.Root show={orders.length ? true : false} as={Fragment}>
+        <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
+          <BackgroundModal />
+
+          <div className="fixed top-[7vh] z-10 w-screen  overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                enterTo="opacity-100 translate-y-0 sm:scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+              >
+                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
+                  <div ref={divRef} className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                      Nàng đang có 2 đơn hàng:
+                    </Dialog.Title>
+                    {orders.map((order, index) => (<div className='mb-6 text-gray-900' key={order._id}>
+                      <div>{order.stt}. {moment(order.updateAt).format('DD/MM/YYYY HH:mm')}</div>
+                      <div className='flex'>
+                        <span className="text-center text-md text-gray-900 font-semibold">{order.info.name} - {order.info.phone}</span>
+                      </div>
+                      <div className='flex'>
+                        <span className="text-start text-md text-gray-900 ">{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
+                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(`${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}`)} />
+                      </div>
+                      <div>{order.products.map(p => (
+                        <div key={order._id + p._id + p.unit}>{p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
+                      ))}</div>
+                      <div className='flex'>
+                        <span className="text-center text-lg text-green-500 font-semibold">{order.payment === 'cod' ? order.totalAmount : 0}</span> ({order.payment === 'ck' ? 'Chuyển khoản' : 'COD'})
+                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(order.payment === 'cod' ? order.totalAmount : 0)} />
+                      </div>
+                      <div className='flex'>
+                        <span className="text-center text-lg  font-semibold">{order.info.ig}</span>
+                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(order.info.ig)} />
+                      </div>
+
+                      {order.info.note ? <div>KHÁCH NOTE: {order.info.note}</div> : <></>}
+
+                      {order.statusLogistic === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' >Đã lên ĐVVC</button> : <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Đánh dấu đã lên ĐVVC</button>}
+
+                      <div>--------------------------------------------------------</div>
+                    </div>))}
+                  </div>
+
+                  <div className="bg-white px-4 py-3 flex justify-between ">
+                    <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { }}>
+                      Đồng ý
+                    </button>
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
