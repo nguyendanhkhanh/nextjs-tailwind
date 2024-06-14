@@ -801,26 +801,29 @@ export default function Home() {
                         <span className="text-md text-gray-900 font-semibold me-1">Người nhận: </span>
                         <span className="text-center text-md text-gray-900">{order.info.name} - {order.info.phone}</span>
                       </div>
-                      <div className='flex mb-2'>
+                      <div className='flex'>
                         <span className="text-start text-md text-gray-900"><span className="font-semibold">Địa chỉ: </span>{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
                       </div>
+                      {order.info.note
+                        ? <div className='flex mb-2'>
+                          <span className="text-start text-md text-gray-900"><span className="font-semibold">Note: </span>{order.info.note}</span>
+                        </div>
+                        : <></>
+                      }
                       <span className="text-md text-gray-900 font-semibold me-1 ">Danh sách sản phẩm: </span>
                       <div>{order.products.map(p => (
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
                       <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
                       <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}</div>
-
-
-                      {order.info.note ? <div>KHÁCH NOTE: {order.info.note}</div> : <></>}
-
-
-                      <div>---------------------------------------------------</div>
+                      <div>----------------------------------------------------</div>
                     </div>))}
+
+                    <div className="text-center text-xs italic text-red-500">(Đây là đơn hàng đặt thử. Thông tin đơn hàng sẽ tự động xóa vào lúc 20h30)</div>
                   </div>
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
-                    <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { }}>
+                    <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { if (orders.length < 2) setOrders([]) }}>
                       Đồng ý
                     </button>
                   </div>
