@@ -78,7 +78,7 @@ export default function Home() {
 
 
   const [orders, setOrders] = useState<any[]>([])
-  
+
 
   useEffect(() => {
     getDeviceCode()
@@ -793,34 +793,29 @@ export default function Home() {
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
                   <div ref={divRef} className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                      Nàng đang có 2 đơn hàng:
+                      Nàng đang có {orders.length} đơn hàng:
                     </Dialog.Title>
-                    {orders.map((order, index) => (<div className='mb-6 text-gray-900' key={order._id}>
-                      <div>{order.stt}. {moment(order.updateAt).format('DD/MM/YYYY HH:mm')}</div>
-                      <div className='flex'>
-                        <span className="text-center text-md text-gray-900 font-semibold">{order.info.name} - {order.info.phone}</span>
+                    {orders.map((order, index) => (<div className='mb-6 text-gray-900 mt-2 text-sm' key={order._id}>
+                      <div className="text-gray-600 text-sm italic">{moment(order.updateAt).format('DD/MM/YYYY HH:mm')}</div>
+                      <div className='flex '>
+                        <span className="text-md text-gray-900 font-semibold me-1">Người nhận: </span>
+                        <span className="text-center text-md text-gray-900">{order.info.name} - {order.info.phone}</span>
                       </div>
-                      <div className='flex'>
-                        <span className="text-start text-md text-gray-900 ">{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
-                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(`${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}`)} />
+                      <div className='flex mb-2'>
+                        <span className="text-start text-md text-gray-900"><span className="font-semibold">Địa chỉ: </span>{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
                       </div>
+                      <span className="text-md text-gray-900 font-semibold me-1 ">Danh sách sản phẩm: </span>
                       <div>{order.products.map(p => (
-                        <div key={order._id + p._id + p.unit}>{p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
+                        <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
-                      <div className='flex'>
-                        <span className="text-center text-lg text-green-500 font-semibold">{order.payment === 'cod' ? order.totalAmount : 0}</span> ({order.payment === 'ck' ? 'Chuyển khoản' : 'COD'})
-                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(order.payment === 'cod' ? order.totalAmount : 0)} />
-                      </div>
-                      <div className='flex'>
-                        <span className="text-center text-lg  font-semibold">{order.info.ig}</span>
-                        <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2  cursor-pointer" onClick={() => copy(order.info.ig)} />
-                      </div>
+                      <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
+                      <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}</div>
+
 
                       {order.info.note ? <div>KHÁCH NOTE: {order.info.note}</div> : <></>}
 
-                      {order.statusLogistic === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' >Đã lên ĐVVC</button> : <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Đánh dấu đã lên ĐVVC</button>}
 
-                      <div>--------------------------------------------------------</div>
+                      <div>---------------------------------------------------</div>
                     </div>))}
                   </div>
 
