@@ -475,6 +475,15 @@ export default function Home() {
     }
   }
 
+  const cancelOrderApi = async (id: string) => {
+    await axios.post(HOST + '/api/order/cancel', {
+      cartId: id
+    })
+    setTimeout(() => {
+      location.reload()
+    }, 1000);
+  }
+
   const calculateOrder = async () => {
     await axios.post(HOST + '/api/order/calculate', {
       carts: carts,
@@ -719,7 +728,7 @@ export default function Home() {
                         <div>
                           {(payment === 'ck' || deposite) ? <>
                             <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
-                              🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 12 tiếng, quá thời hạn Amanda xin phép hủy đơn nha
+                              🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 5 phút, chụp màn hình chuyển khoản thành công gửi shop nha
                             </Dialog.Title>
                             <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
                           </> : <></>
@@ -815,11 +824,13 @@ export default function Home() {
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
                       <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
-                      <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}</div>
+                      <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
+                        <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button>
+                      </div>
                       <div>----------------------------------------------------</div>
                     </div>))}
 
-                    <div className="text-center text-xs italic text-red-500">(Đây là đơn hàng đặt thử. Thông tin đơn hàng sẽ tự động xóa vào lúc 20h30)</div>
+                    {/* <div className="text-center text-xs italic text-red-500">(Đây là đơn hàng đặt thử. Thông tin đơn hàng sẽ tự động xóa vào lúc 20h30)</div> */}
                   </div>
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
