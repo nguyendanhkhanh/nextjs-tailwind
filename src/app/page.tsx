@@ -432,20 +432,28 @@ export default function Home() {
       setCartId(resp.cartId)
       setStep(step + 1)
       setStartCountDown(true)
-      setTimeout(() => {
+      var timeoutCancel = setTimeout(() => {
         cancelOrder(resp.cartId)
-        // }, 5 * 60 * 1000);
-      }, 10 * 1000);
+      }, 5 * 60 * 1000);
+      // }, 10 * 1000);
     }
   }
 
   const cancelOrder = async (id: string) => {
-    if (id) {
-      await axios.post(HOST + '/api/order/cancel', {
-        cartId: id
-      })
+    const currentCartId = cartIdRef.current;
+    const currentCarts = cartsRef.current;
+    if (currentCarts.length && currentCartId) {
+      setCarts([])
+      setCartId('')
+      if (id) {
+        await axios.post(HOST + '/api/order/cancel', {
+          cartId: id
+        })
+      }
+      setTimeout(() => {
+        location.reload()
+      }, 1000);
     }
-    location.reload()
   }
 
   const calculateOrder = async () => {
@@ -459,9 +467,12 @@ export default function Home() {
   }
 
   const customerCompleteOrder = async () => {
-    await axios.post(HOST + '/api/order/customerComplete', {
+    await axios.post(HOST + '/api/order/customer-complete', {
       cartId: cartId
     })
+    setCarts([])
+    setCartId('')
+    setStartCountDown(false)
   }
 
   const done = () => {
@@ -521,7 +532,7 @@ export default function Home() {
                       <div className="mx-auto flex h-12 w-20 flex-shrink-0 items-center justify-center rounded-full bg-red-100 mb-4">
                         <img className="w-20" src="./logo-circle.svg" />
                       </div>
-                      {startCountDown &&
+                      {startCountDown && step === 3 &&
                         <>
                           <CountDownComplete initialMinutes={5} />
                           <span className="text-mini italic text-red-500 text-left">(Slot của nàng đã được giữ. Vui lòng hoàn tất bước này trong vòng 5 phút. Nếu chỉ tạo đơn thử, vui lòng bấm Hủy đơn để nhường slot cho người khác)</span>
@@ -728,7 +739,7 @@ export default function Home() {
                     {step === 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => cancelOrder(cartId)}>
                       Hủy đơn
                     </button>}
-                    {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
+                    {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" disabled={!carts.length} onClick={() => nextStep()}>
                       Tiếp tục
                     </button>}
                     {step === 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
