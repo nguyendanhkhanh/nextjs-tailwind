@@ -533,10 +533,10 @@ export default function Home() {
 
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
-        <OrderProductList
+        {/* <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
