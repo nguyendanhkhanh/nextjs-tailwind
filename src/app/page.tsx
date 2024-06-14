@@ -554,7 +554,7 @@ export default function Home() {
                       {startCountDown && step === 3 &&
                         <>
                           <CountDownComplete initialMinutes={5} />
-                          <span className="text-mini italic text-red-500 text-left">(Slot của nàng đã được giữ. Vui lòng hoàn tất bước này trong vòng 5 phút. Nếu chỉ tạo đơn thử, vui lòng bấm Hủy đơn để nhường slot cho người khác)</span>
+                          <span className="text-mini italic text-red-500 text-left">(Slot của nàng đã được giữ. Vui lòng hoàn tất bước này trong vòng 5 phút. Nếu không muốn tiếp tục, vui lòng bấm Hủy đơn)</span>
                         </>
                       }
                       {step < 4 && <div className="mt-4 text-center sm:mt-0 sm:text-left">
