@@ -227,6 +227,14 @@ export default function Home() {
     setOrders(list)
   }
 
+  const onOpenCart = (carts: CartType[], totalPrice = 0)  => {
+
+  }
+
+  const onChangeProduct = () => {
+    
+  }
+
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
     setIsDone(false)
     const cartsOrder = carts.filter(product => {
@@ -547,14 +555,14 @@ export default function Home() {
             <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
           </div>
 
-          <div tabIndex={0}  className="menu dropdown-content bg-base-100 z-[1] mt-4 w-96 p-2 shadow text-center">
+          <div tabIndex={0} className="menu dropdown-content bg-base-100 z-[1] mt-4 w-96 p-2 shadow text-center">
             <span className="text-xl font-semibold">GIỎ HÀNG</span>
             {carts.map((prod, i) => (
-                            <div className="flex items-center justify-between" key={i}>
-                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
-                              <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
-                            </div>
-                          ))}
+              <div className="flex items-center justify-between" key={i}>
+                <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
+                <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -565,6 +573,7 @@ export default function Home() {
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
+          onChangeProduct={onChangeProduct}
           onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
