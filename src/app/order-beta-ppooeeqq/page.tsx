@@ -42,7 +42,7 @@ export default function OrderBeta() {
   const [message, setMesMage] = useState('')
 
   const sendMessage = async (order) => {
-    const content = `Amanda gửi nàng xác nhận đơn đặt hàng thành công gồm có:\n${order.products.map(p => (`${p.name} size ${p.unit} (x${p.quantity}): ${toThousand(p.quantity * p.price)}`)).join('\n')}\n\nPhí ship: ${toThousand(order.ship)}\n${order.info.gift ? `Quà tặng: ${order.info.gift}` : ''}\n${order.totalAmount < order.totalPayment ? `Cọc: ${toThousand(order.totalAmount - order.totalPayment)}` : ''}\nTổng tiền: ${toThousand(order.totalAmount)} ${order.discount ? '(đã bao gồm giảm 5% feedback)' : ''}\nHình thức thanh toán: ${order.payment === 'ck' ? 'Chuyển khoản' : 'COD'}\n\nThông tin nhận hàng:\n${order.info.name}\n${order.info.phone}\n${order.info.address} - ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}\n\nCảm ơn nàng đã mua hàng tại Amanda Era ❤️
+    const content = `Amanda gửi nàng xác nhận đơn đặt hàng thành công gồm có:\n\n${order.products.map(p => (`${p.name} size ${p.unit} (x${p.quantity}): ${toThousand(p.quantity * p.price)}`)).join('\n')}\n\nPhí ship: ${toThousand(order.ship)}\n${order.info.gift ? `Quà tặng: ${order.info.gift}` : ''}\n${order.totalAmount < order.totalPayment ? `Cọc: ${toThousand(order.totalAmount - order.totalPayment)}` : ''}\nTổng tiền: ${toThousand(order.totalAmount)} ${order.discount ? '(đã bao gồm giảm 5% feedback)' : ''}\nHình thức thanh toán: ${order.payment === 'ck' ? 'Chuyển khoản' : 'COD'}\n\nThông tin nhận hàng:\n${order.info.name}\n${order.info.phone}\n${order.info.address} - ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}\n\nCảm ơn nàng đã mua hàng tại Amanda Era ❤️
     `
     copy(content)
     await axios.get(HOST + `/api/order/markSend?_id=${order._id}&status=${!Number(order.statusMessage) ? 1 : 0}`)
@@ -135,12 +135,13 @@ export default function OrderBeta() {
           <div>{order.products.map(p => (
             <div key={order._id + p._id + p.unit}>{p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
           ))}</div>
+          <span>Quà tặng: {order.info.gift || 'Không có'}</span>
           <div className='flex'>
             <span className="text-center text-lg text-green-500 font-semibold">{order.payment === 'cod' ? order.totalAmount : 0}</span> ({order.payment === 'ck' ? 'Chuyển khoản' : 'COD'})
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.payment === 'cod' ? order.totalAmount : 0)} />
           </div>
           <div className='flex'>
-            <span className="text-center text-lg text-white font-semibold">{order.info.ig}</span>
+            <span className="text-center text-lg text-red-500 font-semibold">{order.info.ig}</span>
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.info.ig)} />
           </div>
 
@@ -179,7 +180,7 @@ export default function OrderBeta() {
             </div>
           </div>
 
-              <div>--------------------------------------------------------</div>
+          <div>--------------------------------------------------------</div>
         </div>))}
       </div>
 

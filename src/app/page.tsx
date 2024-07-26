@@ -519,6 +519,21 @@ export default function Home() {
     document.body.removeChild(el);
   }
 
+  const isMoreThan10Minutes = (isoStringA, isoStringB) => {
+    // Chuyển chuỗi ISOString thành đối tượng Date
+    const dateA = new Date(isoStringA);
+    const dateB = new Date(isoStringB);
+
+    // Tính khoảng cách thời gian giữa hai mốc thời gian (B - A) tính bằng mili giây
+    const timeDifference = dateB - dateA;
+
+    // Chuyển đổi mili giây thành phút
+    const timeDifferenceInMinutes = timeDifference / (1000 * 60);
+
+    // Kiểm tra nếu khoảng cách thời gian lớn hơn 10 phút
+    return timeDifferenceInMinutes > 10;
+  }
+
   return (
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
@@ -532,11 +547,11 @@ export default function Home() {
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
-        <Countdown />
+        {/* <Countdown />
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -823,9 +838,8 @@ export default function Home() {
                       <div>{order.products.map(p => (
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
-                      <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
                       <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
-                        <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button>
+                        {order.statusMessage == 0 && !isMoreThan10Minutes(order.updateAt, new Date().toISOString()) ? <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button> : <></>}
                       </div>
                       <div>----------------------------------------------------</div>
                     </div>))}

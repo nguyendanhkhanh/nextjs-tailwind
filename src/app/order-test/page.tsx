@@ -533,10 +533,10 @@ export default function Home() {
 
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
-        <OrderProductList
+        {/* <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -823,7 +823,6 @@ export default function Home() {
                       <div>{order.products.map(p => (
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
-                      <div className="font-semibold mt-2">Phí ship: {toThousand(order.ship)}</div>
                       <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
                         <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button>
                       </div>
