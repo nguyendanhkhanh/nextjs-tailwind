@@ -392,7 +392,8 @@ export default function Home() {
       }
       let depositValue = 0
       if (payment === 'cod' && totalPrice >= 600000) {
-        depositValue = 50000
+        depositValue = toRounded(totalPrice * 0.2)
+        console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
       }
       setDeposite(depositValue)
       const totalAmountValue = totalPriceAfterDiscount + shipValue
@@ -539,19 +540,32 @@ export default function Home() {
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
         <div></div>
         <img className="w-40" src="./logo-square.png" />
-        <div className="relative mb-1">
-          <ShoppingBagIcon className="h-6 w-6 gray-900" />
-          <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
+        <div className="dropdown dropdown-end">
+          {/* <div  role="button" className="btn btn-ghost rounded-btn">Dropdown</div> */}
+          <div tabIndex={0} role="button" className="relative mb-1 cursor-pointer">
+            <ShoppingBagIcon className="h-6 w-6 gray-900" />
+            <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
+          </div>
+
+          <div tabIndex={0}  className="menu dropdown-content bg-base-100 z-[1] mt-4 w-96 p-2 shadow text-center">
+            <span className="text-xl font-semibold">GIỎ HÀNG</span>
+            {carts.map((prod, i) => (
+                            <div className="flex items-center justify-between" key={i}>
+                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
+                              <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
+                            </div>
+                          ))}
+          </div>
         </div>
 
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
-        {/* <Countdown />
+        <Countdown />
         <OrderProductList
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>

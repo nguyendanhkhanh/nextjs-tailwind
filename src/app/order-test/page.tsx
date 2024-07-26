@@ -79,7 +79,6 @@ export default function Home() {
 
   const [orders, setOrders] = useState<any[]>([])
 
-  const [cancel]
 
   useEffect(() => {
     getDeviceCode()
