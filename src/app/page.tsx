@@ -547,8 +547,13 @@ export default function Home() {
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
+<<<<<<< HEAD
         {/* <Countdown />
         <OrderProductList
+=======
+        <Countdown />
+        {/* <OrderProductList
+>>>>>>> 53ab634e9771c10e795f480e910077b71b9bdf11
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}

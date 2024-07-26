@@ -79,6 +79,7 @@ export default function Home() {
 
   const [orders, setOrders] = useState<any[]>([])
 
+  const [cancel]
 
   useEffect(() => {
     getDeviceCode()
@@ -471,7 +472,7 @@ export default function Home() {
       }
       setTimeout(() => {
         location.reload()
-      }, 1000);
+      }, 3000);
     }
   }
 
