@@ -438,7 +438,7 @@ export default function Home() {
       const bankValue = payment === 'ck' ? totalPaymentValue : depositValue
 
       if (bankValue) {
-        const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(bankValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2050k'}`
+        const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(bankValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2020'}`
         setUrlQr(url)
       }
 
@@ -588,26 +588,29 @@ export default function Home() {
             <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
           </div>
 
-          <div tabIndex={0} className="menu dropdown-content bg-white z-[1]  mt-4 w-96 pr-2 shadow text-center min-h-64">
+          <div tabIndex={0} className="menu dropdown-content bg-white z-[1]  mt-4 w-80 pr-2 shadow text-center min-h-64">
             <span className="text-xl font-semibold mb-2">GIỎ HÀNG</span>
             {carts.length
               ?
               <>
-                {carts.map((prod, i) => (
-                  <div className="fle items-center justify-between " key={i}>
-                    <div className="flex items-center ">
-                      <img className='w-20 h-20 object-cover rounded-lg border border-gray-50 mr-2' src={prod.image} />
-                      <div className="flex flex-col items-start flex-1">
-                        <span >{prod.name + ' size ' + prod.unit + ' '}</span>
-                        <div className="text-base">
-                          <span className="">{prod.quantity} x </span>
-                          <span className="font-medium ">{toThousand(prod.price * prod.quantity)}</span>
+                <div className=" max-h-96 overflow-y-auto ">
+                  {carts.map((prod, i) => (
+                    <div className="fle items-center justify-between " key={i}>
+                      <div className="flex items-center ">
+                        <img className='w-20 h-20 object-cover rounded-lg border border-gray-50 mr-2' src={prod.image} />
+                        <div className="flex flex-col items-start flex-1">
+                          <span >{prod.name + ' size ' + prod.unit + ' '}</span>
+                          <div className="text-base">
+                            <span className="">{prod.quantity} x </span>
+                            <span className="font-medium ">{toThousand(prod.price * prod.quantity)}</span>
+                          </div>
                         </div>
+                        <XCircleIcon className="h-6 w-6 gray-900 cursor-pointer" onClick={() => onRemoveProductInCart(prod)} />
                       </div>
-                      <XCircleIcon className="h-6 w-6 gray-900 cursor-pointer" onClick={() => onRemoveProductInCart(prod)} />
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
                 <div className="flex  justify-between mt-4 px-1 text-md">
                   <span className="">Tổng tiền:</span>
                   <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
@@ -618,7 +621,6 @@ export default function Home() {
                   {/* <span className="loading loading-spinner w-4"></span> */}
                 </button>
               </>
-
               : <div className="flex flex-col items-center justify-center py-6">
                 <ShoppingBagIcon className="h-24 w-24 text-gray-300 mb-3" />
                 <span>Chưa có sản phẩm trong giỏ hàng</span>
