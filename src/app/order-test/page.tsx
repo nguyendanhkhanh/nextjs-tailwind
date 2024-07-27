@@ -14,6 +14,7 @@ import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
 import CountDownComplete from "@/components/CountDownComplete";
+import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
 import moment from 'moment'
 
 export default function Home() {
@@ -39,6 +40,8 @@ export default function Home() {
   const cancelButtonRef = useRef(null)
 
   const [startCountDown, setStartCountDown] = useState(false)
+
+  const [dialogCancelOrder, setDialogCancelOrder] = useState(false)
 
   const [info, setInfo] = useState(!ISSERVER && localStorage.getItem('info') ? JSON.parse(localStorage.getItem('info') || '{}') : {
     ig: '',
@@ -503,10 +506,12 @@ export default function Home() {
         await axios.post(HOST + '/api/order/cancel', {
           cartId: id
         })
+        setDialogCancelOrder(true)
       }
       setTimeout(() => {
+        setDialogCancelOrder(false)
         location.reload()
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -514,9 +519,12 @@ export default function Home() {
     await axios.post(HOST + '/api/order/cancel', {
       cartId: id
     })
+    setDialogCancelOrder(true)
+
     setTimeout(() => {
+      setDialogCancelOrder(false)
       location.reload()
-    }, 1000);
+    }, 3000);
   }
 
   const calculateOrder = async () => {
@@ -600,7 +608,7 @@ export default function Home() {
                         <img className='w-20 h-20 object-cover rounded-lg border border-gray-50 mr-2' src={prod.image} />
                         <div className="flex flex-col items-start flex-1">
                           <span >{prod.name + ' size ' + prod.unit + ' '}</span>
-                          <div className="text-base">
+                          <div className="text-md">
                             <span className="">{prod.quantity} x </span>
                             <span className="font-medium ">{toThousand(prod.price * prod.quantity)}</span>
                           </div>
@@ -614,6 +622,9 @@ export default function Home() {
                 <div className="flex  justify-between mt-4 px-1 text-md">
                   <span className="">Tổng tiền:</span>
                   <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
+                </div>
+                <div className="flex  justify-between px-1 text-md">
+                  <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
                 <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
                   Đặt hàng
@@ -727,7 +738,7 @@ export default function Home() {
                           {step === 3 && deposite ?
                             <>
                               <div className="flex items-center justify-between mt-1  text-warning">
-                                <span className="font-semibold">Cọc:</span>
+                                <span className="font-semibold">Cọc 20%:</span>
                                 <span className="font-semibold ms-2">{toThousand(deposite)}</span>
                               </div>
                               <div className="flex items-center justify-between mt-1 text-success">
@@ -831,7 +842,7 @@ export default function Home() {
                         <div>
                           {(payment === 'ck' || deposite) ? <>
                             <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
-                              🎀 Nàng vui lòng hoàn tất chuyển khoản trong vòng 5 phút, chụp màn hình chuyển khoản thành công gửi shop nha
+                              🎀 Sau khi hoàn tất chuyển khoản trong vòng 5 phút, nàng vui lòng chụp màn hình chuyển khoản thành công gửi cho Amanda nha
                             </Dialog.Title>
                             <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
                           </> : <></>
@@ -935,9 +946,9 @@ export default function Home() {
                   </div>
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
-                    <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { if (orders.length < 2) setOrders([]) }}>
+                    {orders.length < 2 ? <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { if (orders.length < 2) setOrders([]) }}>
                       Đồng ý
-                    </button>
+                    </button> : <></>}
                   </div>
                 </Dialog.Panel>
               </Transition.Child>
@@ -946,6 +957,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
+      <DialogCancelOrderSuccess visible={dialogCancelOrder} />
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">
