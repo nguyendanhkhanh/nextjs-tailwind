@@ -5,7 +5,7 @@ import Countdown from "@/app/order-test/Countdown";
 import OrderProductList from "@/app/order-test/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
 import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
@@ -70,6 +70,9 @@ export default function Home() {
   const [cartId, setCartId] = useState('')
   const cartIdRef = useRef(cartId);
   const cartsRef = useRef(carts)
+  const [productRemove, setProductRemove] = useState(null)
+  const [trackingClickOrder, setTrackingClickOrder] = useState(false)
+
 
   const [soldout, setSoldout] = useState([])
 
@@ -227,8 +230,11 @@ export default function Home() {
     setOrders(list)
   }
 
-  const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
-    setIsDone(false)
+  const onOpenCart = (carts: CartType[], totalPrice = 0) => {
+
+  }
+
+  const onChangeProduct = (carts: CartType[], totalPrice = 0) => {
     const cartsOrder = carts.filter(product => {
       const existUnit = product.units.find(u => u.quantity)
       return existUnit ? true : false
@@ -243,14 +249,42 @@ export default function Home() {
             unit: unit.code,
             quantity: unit.quantity,
             price: prod.price,
+            image: prod.image
           })
         }
       })
     })
     setCarts(cartsConvert)
+    setTotalPrice(totalPrice)
+  }
+
+  const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
+    setIsDone(false)
+    setTrackingClickOrder(false)
+    const cartsOrder = carts.filter(product => {
+      const existUnit = product.units.find(u => u.quantity)
+      return existUnit ? true : false
+    })
+    const cartsConvert = [] as any[]
+    cartsOrder.forEach(prod => {
+      prod.units.forEach(unit => {
+        if (unit.quantity) {
+          cartsConvert.push({
+            _id: prod._id,
+            name: prod.name,
+            unit: unit.code,
+            quantity: unit.quantity,
+            price: prod.price,
+            image: prod.image
+
+          })
+        }
+      })
+    })
+    setCarts(cartsConvert)
+    setTotalPrice(totalPrice)
     setStep(1)
     setDialogConfirm(true)
-    setTotalPrice(totalPrice)
   }
 
   const getAllAddress = async () => {
@@ -392,7 +426,8 @@ export default function Home() {
       }
       let depositValue = 0
       if (payment === 'cod' && totalPrice >= 600000) {
-        depositValue = 50000
+        depositValue = toRounded(totalPrice * 0.2)
+        console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
       }
       setDeposite(depositValue)
       const totalAmountValue = totalPriceAfterDiscount + shipValue
@@ -471,7 +506,7 @@ export default function Home() {
       }
       setTimeout(() => {
         location.reload()
-      }, 3000);
+      }, 1000);
     }
   }
 
@@ -519,24 +554,90 @@ export default function Home() {
     document.body.removeChild(el);
   }
 
+  const isMoreThan10Minutes = (isoStringA, isoStringB) => {
+    // Chuyển chuỗi ISOString thành đối tượng Date
+    const dateA = new Date(isoStringA);
+    const dateB = new Date(isoStringB);
+
+    // Tính khoảng cách thời gian giữa hai mốc thời gian (B - A) tính bằng mili giây
+    const timeDifference = dateB - dateA;
+
+    // Chuyển đổi mili giây thành phút
+    const timeDifferenceInMinutes = timeDifference / (1000 * 60);
+
+    // Kiểm tra nếu khoảng cách thời gian lớn hơn 10 phút
+    return timeDifferenceInMinutes > 10;
+  }
+
+  const onRemoveProductInCart = (prod: any) => {
+    setProductRemove(prod)
+  }
+  const resetProductRemove = () => {
+    setProductRemove(null)
+  }
+
   return (
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
         <div></div>
         <img className="w-40" src="./logo-square.png" />
-        <div className="relative mb-1">
-          <ShoppingBagIcon className="h-6 w-6 gray-900" />
-          <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
+        <div className="dropdown dropdown-end">
+          {/* <div  role="button" className="btn btn-ghost rounded-btn">Dropdown</div> */}
+          <div tabIndex={0} role="button" className="relative mb-1 cursor-pointer">
+            <ShoppingBagIcon className="h-6 w-6 gray-900" />
+            <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
+          </div>
+
+          <div tabIndex={0} className="menu dropdown-content bg-white z-[1]  mt-4 w-96 pr-2 shadow text-center min-h-64">
+            <span className="text-xl font-semibold mb-2">GIỎ HÀNG</span>
+            {carts.length
+              ?
+              <>
+                {carts.map((prod, i) => (
+                  <div className="fle items-center justify-between " key={i}>
+                    <div className="flex items-center ">
+                      <img className='w-20 h-20 object-cover rounded-lg border border-gray-50 mr-2' src={prod.image} />
+                      <div className="flex flex-col items-start flex-1">
+                        <span >{prod.name + ' size ' + prod.unit + ' '}</span>
+                        <div className="text-base">
+                          <span className="">{prod.quantity} x </span>
+                          <span className="font-medium ">{toThousand(prod.price * prod.quantity)}</span>
+                        </div>
+                      </div>
+                      <XCircleIcon className="h-6 w-6 gray-900 cursor-pointer" onClick={() => onRemoveProductInCart(prod)} />
+                    </div>
+                  </div>
+                ))}
+                <div className="flex  justify-between mt-4 px-1 text-md">
+                  <span className="">Tổng tiền:</span>
+                  <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
+                </div>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                  Đặt hàng
+                  <HeartIcon className='w-4' />
+                  {/* <span className="loading loading-spinner w-4"></span> */}
+                </button>
+              </>
+
+              : <div className="flex flex-col items-center justify-center py-6">
+                <ShoppingBagIcon className="h-24 w-24 text-gray-300 mb-3" />
+                <span>Chưa có sản phẩm trong giỏ hàng</span>
+              </div>}
+          </div>
         </div>
 
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
-        {/* <OrderProductList
+        <OrderProductList
+          productRemove={productRemove}
+          resetProductRemove={resetProductRemove}
+          trackingClickOrder={trackingClickOrder}
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
+          onChangeProduct={onChangeProduct}
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -824,12 +925,11 @@ export default function Home() {
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
                       <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
-                        <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button>
+                        {order.statusMessage == 0 && !isMoreThan10Minutes(order.updateAt, new Date().toISOString()) ? <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button> : <></>}
                       </div>
                       <div>----------------------------------------------------</div>
                     </div>))}
 
-                    {/* <div className="text-center text-xs italic text-red-500">(Đây là đơn hàng đặt thử. Thông tin đơn hàng sẽ tự động xóa vào lúc 20h30)</div> */}
                   </div>
 
                   <div className="bg-white px-4 py-3 flex justify-between ">

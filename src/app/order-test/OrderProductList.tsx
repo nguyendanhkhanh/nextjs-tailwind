@@ -13,7 +13,16 @@ const ISSERVER = typeof window === "undefined";
 
 function OrderProductList(props: any) {
 
-  const { onClickOrder, onResetOrder, isDone, onChangeTotalProduct } = props
+  const { 
+    onClickOrder,
+    onChangeProduct,
+    productRemove,
+    resetProductRemove,
+    trackingClickOrder,
+    onResetOrder,
+    isDone,
+    onChangeTotalProduct
+   } = props
 
   const [products, setProducts] = useState<ProductType[]>([])
   // const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
@@ -21,6 +30,23 @@ function OrderProductList(props: any) {
   const [carts, setCarts] = useState<CartType[]>([])
   const [totalProduct, setTotalProduct] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
+
+
+  useEffect(() => {
+    if (productRemove) {
+      removeProduct(productRemove)
+    }
+    return () => {
+    }
+  }, [productRemove])
+
+  useEffect(() => {
+    if (trackingClickOrder) {
+      onClickOrder(carts, totalPrice)
+    }
+    return () => {
+    }
+  }, [trackingClickOrder])
 
 
   useEffect(() => {
@@ -37,8 +63,27 @@ function OrderProductList(props: any) {
     };
   }, [])
 
+  // useEffect(() => {
+  //   eventEmitter.on('removeProduct', removeProduct);
+  //   return () => {
+  //     eventEmitter.off('removeProduct', removeProduct);
+  //   };
+  // }, [])
+
   const soldProducts = (soldout: any[]) => {
 
+  }
+
+  const removeProduct = (prod) => {
+    const prodInCart = carts.find(p => p._id == prod._id)
+    if (prodInCart) {
+      const unit = prodInCart.units.find(u => u.code === prod.unit)
+      if (unit) {
+        unit.quantity = 0
+        setCarts([...carts])
+      }
+    }
+    resetProductRemove()
   }
 
   const reloadProducts = () => {
@@ -66,6 +111,8 @@ function OrderProductList(props: any) {
     setTotalPrice(totalPrice)
 
     onChangeTotalProduct(totalProd)
+
+    onChangeProduct(carts, totalPrice)
 
     // localStorage.setItem('carts', JSON.stringify(cartsNotEmpty.map(cart => ({
     //   id: cart._id,
@@ -162,6 +209,7 @@ function OrderProductList(props: any) {
   const onResetCart = () => {
     setStorageCart([])
   }
+
 
   return (
     <div className='mt-2 flex flex-col items-center px-2 text-gray-900'>

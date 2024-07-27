@@ -5,7 +5,7 @@ import Countdown from "@/app/order-test/Countdown";
 import OrderProductList from "@/app/order-test/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon } from '@heroicons/react/24/outline'
+import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartRequest, CartType } from "@/interface/Product";
 import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
@@ -70,6 +70,9 @@ export default function Home() {
   const [cartId, setCartId] = useState('')
   const cartIdRef = useRef(cartId);
   const cartsRef = useRef(carts)
+  const [productRemove, setProductRemove] = useState(null)
+  const [trackingClickOrder, setTrackingClickOrder] = useState(false)
+
 
   const [soldout, setSoldout] = useState([])
 
@@ -227,16 +230,11 @@ export default function Home() {
     setOrders(list)
   }
 
-  const onOpenCart = (carts: CartType[], totalPrice = 0)  => {
+  const onOpenCart = (carts: CartType[], totalPrice = 0) => {
 
   }
 
-  const onChangeProduct = () => {
-    
-  }
-
-  const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
-    setIsDone(false)
+  const onChangeProduct = (carts: CartType[], totalPrice = 0) => {
     const cartsOrder = carts.filter(product => {
       const existUnit = product.units.find(u => u.quantity)
       return existUnit ? true : false
@@ -251,14 +249,42 @@ export default function Home() {
             unit: unit.code,
             quantity: unit.quantity,
             price: prod.price,
+            image: prod.image
           })
         }
       })
     })
     setCarts(cartsConvert)
+    setTotalPrice(totalPrice)
+  }
+
+  const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
+    setIsDone(false)
+    setTrackingClickOrder(false)
+    const cartsOrder = carts.filter(product => {
+      const existUnit = product.units.find(u => u.quantity)
+      return existUnit ? true : false
+    })
+    const cartsConvert = [] as any[]
+    cartsOrder.forEach(prod => {
+      prod.units.forEach(unit => {
+        if (unit.quantity) {
+          cartsConvert.push({
+            _id: prod._id,
+            name: prod.name,
+            unit: unit.code,
+            quantity: unit.quantity,
+            price: prod.price,
+            image: prod.image
+
+          })
+        }
+      })
+    })
+    setCarts(cartsConvert)
+    setTotalPrice(totalPrice)
     setStep(1)
     setDialogConfirm(true)
-    setTotalPrice(totalPrice)
   }
 
   const getAllAddress = async () => {
@@ -543,6 +569,13 @@ export default function Home() {
     return timeDifferenceInMinutes > 10;
   }
 
+  const onRemoveProductInCart = (prod: any) => {
+    setProductRemove(prod)
+  }
+  const resetProductRemove = () => {
+    setProductRemove(null)
+  }
+
   return (
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
@@ -555,14 +588,41 @@ export default function Home() {
             <div className="bg-red-500 w-4 h-4 flex items-center justify-center rounded-full text-mini text-white absolute top-4 left-3">{totalProduct}</div>
           </div>
 
-          <div tabIndex={0} className="menu dropdown-content bg-base-100 z-[1] mt-4 w-96 p-2 shadow text-center">
-            <span className="text-xl font-semibold">GIỎ HÀNG</span>
-            {carts.map((prod, i) => (
-              <div className="flex items-center justify-between" key={i}>
-                <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
-                <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
-              </div>
-            ))}
+          <div tabIndex={0} className="menu dropdown-content bg-white z-[1]  mt-4 w-96 pr-2 shadow text-center min-h-64">
+            <span className="text-xl font-semibold mb-2">GIỎ HÀNG</span>
+            {carts.length
+              ?
+              <>
+                {carts.map((prod, i) => (
+                  <div className="fle items-center justify-between " key={i}>
+                    <div className="flex items-center ">
+                      <img className='w-20 h-20 object-cover rounded-lg border border-gray-50 mr-2' src={prod.image} />
+                      <div className="flex flex-col items-start flex-1">
+                        <span >{prod.name + ' size ' + prod.unit + ' '}</span>
+                        <div className="text-base">
+                          <span className="">{prod.quantity} x </span>
+                          <span className="font-medium ">{toThousand(prod.price * prod.quantity)}</span>
+                        </div>
+                      </div>
+                      <XCircleIcon className="h-6 w-6 gray-900 cursor-pointer" onClick={() => onRemoveProductInCart(prod)} />
+                    </div>
+                  </div>
+                ))}
+                <div className="flex  justify-between mt-4 px-1 text-md">
+                  <span className="">Tổng tiền:</span>
+                  <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
+                </div>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                  Đặt hàng
+                  <HeartIcon className='w-4' />
+                  {/* <span className="loading loading-spinner w-4"></span> */}
+                </button>
+              </>
+
+              : <div className="flex flex-col items-center justify-center py-6">
+                <ShoppingBagIcon className="h-24 w-24 text-gray-300 mb-3" />
+                <span>Chưa có sản phẩm trong giỏ hàng</span>
+              </div>}
           </div>
         </div>
 
@@ -571,6 +631,9 @@ export default function Home() {
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
         <OrderProductList
+          productRemove={productRemove}
+          resetProductRemove={resetProductRemove}
+          trackingClickOrder={trackingClickOrder}
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeProduct={onChangeProduct}
@@ -822,7 +885,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      {/* <Transition.Root show={orders.length ? true : false} as={Fragment}>
+      <Transition.Root show={orders.length ? true : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 
@@ -879,7 +942,7 @@ export default function Home() {
             </div>
           </div>
         </Dialog>
-      </Transition.Root> */}
+      </Transition.Root>
 
 
       <footer className="ae-order-footer">
