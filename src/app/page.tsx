@@ -1,8 +1,8 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/app/order-test/Countdown";
-import OrderProductList from "@/app/order-test/OrderProductList";
+import Countdown from "@/app/order-test-6666/Countdown";
+import OrderProductList from "@/app/order-test-6666/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
