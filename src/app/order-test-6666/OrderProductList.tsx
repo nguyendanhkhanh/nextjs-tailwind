@@ -154,7 +154,7 @@ function OrderProductList(props: any) {
   }, [isDone])
 
   const getProduct = async () => {
-    const res = await axios.get(HOST + '/api/product-beta?drop=8')
+    const res = await axios.get(HOST + '/api/product-beta?drop=9')
     const data = res.data.data.map((p: any) => {
       return {
         ...p,

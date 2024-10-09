@@ -643,14 +643,14 @@ export default function Home() {
 
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
-        {/* <OrderProductList
+        <OrderProductList
           productRemove={productRemove}
           resetProductRemove={resetProductRemove}
           trackingClickOrder={trackingClickOrder}
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeProduct={onChangeProduct}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -723,15 +723,18 @@ export default function Home() {
                             <>
                               <div className="flex justify-between items-center">
                                 <span className="font-semibold mt-1">Quà tặng kèm:</span>
-                                {step < 3 && <select className="select select-sm rounded-sm  w-52" value={info.gift} onChange={e => setInfo({ ...info, gift: e.target.value })}>
-                                  <option value={'Kẹp tóc hoa lan ngẫu nhiên'} disabled>Kẹp tóc hoa lan</option>
+                                {/* {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
+                                  <option value={'Kẹp tóc hoa lan ngẫu nhiên'} disabled>Kẹp tóc hoa lan ngẫu nhiên</option>
                                   <option value='Kẹp tóc hoa lan tím pastel'>Kẹp tóc tím pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng pastel'>Kẹp tóc hồng pastel</option>
                                   <option value='Kẹp tóc hoa lan màu xanh pastel'>Kẹp tóc xanh pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng'>Kẹp tóc hồng</option>
                                   <option value='Kẹp tóc hoa lan màu trắng'>Kẹp tóc trắng</option>
-                                </select>}
-                                {step === 3 && <span className="mt-1">{info.gift}</span>}
+                                </select>} */}
+                                {step < 3 &&
+                                  <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>
+                                }
+                                {step === 3 && <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>}
                               </div>
                               {step < 3 && <span className="text-mini italic text-start" >(tặng kèm với đơn trên 500k)</span>}
                             </>}
