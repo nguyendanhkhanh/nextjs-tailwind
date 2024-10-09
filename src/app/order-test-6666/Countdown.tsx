@@ -64,10 +64,10 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-      <span className="">New drop is comming soon</span>
+      {/* <span className="">New drop is comming soon</span> */}
       {/* <span className="">Order now !!</span> */}
       <div className="ae-countdown-content mt-4">
-        <div className="ae-countdown-item-container">
+        {/* <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.days }}></span>
           </span>
@@ -90,10 +90,10 @@ export default function Countdown() {
             <span style={{ "--value": countDownTime.seconds }}></span>
           </span>
           <span className="ae-countdown-title">giây</span>
-        </div>
-        {/* <div>
-          September 2024
         </div> */}
+        <div>
+          Order now !!
+        </div>
       </div>
     </div>
 
