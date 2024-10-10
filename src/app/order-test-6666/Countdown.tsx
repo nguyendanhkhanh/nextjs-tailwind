@@ -64,7 +64,7 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-      {/* <span className="">New drop is comming soon</span> */}
+      <span className="">New drop is comming soon</span>
       {/* <span className="">Order now !!</span> */}
       <div className="ae-countdown-content mt-4">
         {/* <div className="ae-countdown-item-container">
@@ -92,7 +92,7 @@ export default function Countdown() {
           <span className="ae-countdown-title">giây</span>
         </div> */}
         <div>
-          Order now !!
+        November 2024
         </div>
       </div>
     </div>
