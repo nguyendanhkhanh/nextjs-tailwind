@@ -23,6 +23,8 @@ export default function Home() {
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
 
+  const [isMerge, setIsMerge] = useState(false);
+
   const [deviceCode, setDeviceCode] = useState('');
 
   const [loading, setLoading] = useState(false)
@@ -466,7 +468,8 @@ export default function Home() {
       cartId: cartId,
       ship: shipValue,
       payment: payment,
-      deposite: depositValue
+      deposite: depositValue,
+      isMerge: isMerge
     })
     const resp = res.data.data
     if (resp.soldoutList.length) {
@@ -626,7 +629,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -643,14 +647,14 @@ export default function Home() {
 
       <div ref={containerRef} className="ae-drop-container mt-20">
         <Countdown />
-        {/* <OrderProductList
+        <OrderProductList
           productRemove={productRemove}
           resetProductRemove={resetProductRemove}
           trackingClickOrder={trackingClickOrder}
           isDone={isDone}
           onClickOrder={onOpenModalConfirm}
           onChangeProduct={onChangeProduct}
-          onChangeTotalProduct={(e: number) => setTotalProduct(e)} /> */}
+          onChangeTotalProduct={(e: number) => setTotalProduct(e)} />
       </div>
 
       <Transition.Root show={dialogConfirm} as={Fragment}>
@@ -769,78 +773,92 @@ export default function Home() {
                           </div>
                         </div> : <></>}
                       </div>}
-                      {step == 2 && <div className="mt-2 text-center sm:mt-0 sm:text-left">
-                        <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 mt-4">
-                          Thông tin của nàng:
-                        </Dialog.Title>
-                        <div className="text-gray-800">
+                      {step == 2 &&
+                        <div className="mt-2 text-center sm:mt-0 sm:text-left">
 
-                          <input type="text" placeholder="Id tài khoản IG (nhớ điền đúng nha)" className="ae-input" value={info.ig} onChange={(e) => setInfo({
-                            ...info,
-                            ig: e.target.value
-                          })} />
-                          <input type="text" placeholder="Số điện thoại" className="ae-input" value={info.phone} onChange={(e) => setInfoPhone(e.target.value)} />
-                          {discountPercent ? <span className="text-mini italic text-start text-green-600" >(được giảm {discountPercent}% feedback)</span> : <span></span>}
-                          {phoneWarning && <span className="text-mini italic text-start text-red-500" >{phoneWarning}</span>}
+                          <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 mt-4">
+                            Thông tin của nàng:
+                          </Dialog.Title>
+                          <div className="text-gray-800">
 
-                          <input type="text" placeholder="Tên" className="ae-input" value={info.name} onChange={(e) => setInfo({
-                            ...info,
-                            name: e.target.value
-                          })} />
+                            <input type="text" placeholder="Id tài khoản IG (nhớ điền đúng nha)" className="ae-input" value={info.ig} onChange={(e) => setInfo({
+                              ...info,
+                              ig: e.target.value
+                            })} />
+                            <input type="text" placeholder="Số điện thoại" className="ae-input" value={info.phone} onChange={(e) => setInfoPhone(e.target.value)} />
+                            {discountPercent ? <span className="text-mini italic text-start text-green-600" >(được giảm {discountPercent}% feedback)</span> : <span></span>}
+                            {phoneWarning && <span className="text-mini italic text-start text-red-500" >{phoneWarning}</span>}
 
-                          <select className="ae-select w-full" value={info.province.code} onChange={e => updateProvince(e.target.value)}>
-                            <option value={''} disabled>Tỉnh / Thành phố</option>
-                            {provinces.map(p => (
-                              <option key={p.code} value={p.code}>{p.name}</option>
-                            ))}
-                          </select>
+                            <input type="text" placeholder="Tên" className="ae-input" value={info.name} onChange={(e) => setInfo({
+                              ...info,
+                              name: e.target.value
+                            })} />
 
-                          <div className="flex justify-between w-full">
-                            <select className="ae-select w-[150px]" value={info.district.code} onChange={e => updateDistrict(e.target.value)}>
-                              <option disabled value={''}>Quận / Huyện</option>
-                              {districts.map(d => (
-                                <option key={d.code} value={d.code}>{d.name}</option>
-                              ))}
-                            </select>
-                            <select className="ae-select w-[150px]" value={info.ward.code} onChange={e => updateWard(e.target.value)}>
-                              <option value={''} disabled>Xã / Phường</option>
-                              {wards.map(p => (
+                            <select className="ae-select w-full" value={info.province.code} onChange={e => updateProvince(e.target.value)}>
+                              <option value={''} disabled>Tỉnh / Thành phố</option>
+                              {provinces.map(p => (
                                 <option key={p.code} value={p.code}>{p.name}</option>
                               ))}
                             </select>
+
+                            <div className="flex justify-between w-full">
+                              <select className="ae-select w-[150px]" value={info.district.code} onChange={e => updateDistrict(e.target.value)}>
+                                <option disabled value={''}>Quận / Huyện</option>
+                                {districts.map(d => (
+                                  <option key={d.code} value={d.code}>{d.name}</option>
+                                ))}
+                              </select>
+                              <select className="ae-select w-[150px]" value={info.ward.code} onChange={e => updateWard(e.target.value)}>
+                                <option value={''} disabled>Xã / Phường</option>
+                                {wards.map(p => (
+                                  <option key={p.code} value={p.code}>{p.name}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4" style={{ fontSize: '16px' }} value={info.address} onChange={(e) => setInfo({
+                              ...info,
+                              address: e.target.value
+                            })} />
+
+                            <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2" style={{ fontSize: '16px' }} value={info.note} onChange={(e) => setInfo({
+                              ...info,
+                              note: e.target.value
+                            })} />
+
+                            <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 my-2">
+                              Hình thức thanh toán:
+                            </Dialog.Title>
+                            <div className="flex items-center justify-around">
+                              <div className=" flex flex-col">
+                                <div className="flex items-center">
+                                  <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
+                                  <span>CK full</span>
+                                </div>
+                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-4" >(phí ship {toThousand(calculateShip(info.province.code, 'ck', totalPrice))})</span>}
+                              </div>
+                              <div className=" flex flex-col">
+                                <div className="flex items-center ">
+                                  <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'cod'} onChange={e => setPayment('cod')} />
+                                  <span>COD</span>
+                                </div>
+                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-3" >(phí ship {toThousand(calculateShip(info.province.code, 'cod', totalPrice))})</span>}
+                              </div>
+                            </div>
+
+                            <div className=" flex flex-col text-gray-600 my-4">
+                            <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                              Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
+                            </Dialog.Title>
+                            <label className="label flex justify-start cursor-pointer pb-0">
+                              <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
+                              <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
+                            </label>
+                            <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
                           </div>
 
-                          <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4" style={{ fontSize: '16px' }} value={info.address} onChange={(e) => setInfo({
-                            ...info,
-                            address: e.target.value
-                          })} />
-
-                          <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2" style={{ fontSize: '16px' }} value={info.note} onChange={(e) => setInfo({
-                            ...info,
-                            note: e.target.value
-                          })} />
-
-                          <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 my-2">
-                            Hình thức thanh toán:
-                          </Dialog.Title>
-                          <div className="flex items-center justify-around">
-                            <div className=" flex flex-col">
-                              <div className="flex items-center">
-                                <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
-                                <span>CK full</span>
-                              </div>
-                              {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-4" >(phí ship {toThousand(calculateShip(info.province.code, 'ck', totalPrice))})</span>}
-                            </div>
-                            <div className=" flex flex-col">
-                              <div className="flex items-center ">
-                                <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'cod'} onChange={e => setPayment('cod')} />
-                                <span>COD</span>
-                              </div>
-                              {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-3" >(phí ship {toThousand(calculateShip(info.province.code, 'cod', totalPrice))})</span>}
-                            </div>
                           </div>
-                        </div>
-                      </div>}
+                        </div>}
                       {step === 4 &&
                         <div>
                           {(payment === 'ck' || deposite) ? <>

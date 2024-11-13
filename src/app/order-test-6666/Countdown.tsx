@@ -10,7 +10,7 @@ export default function Countdown() {
 
   const startCountDown = useCallback(() => {
     const customDate = new Date();
-    const date = new Date(2024, 10 - 1, 9, 21)
+    const date = new Date(2024, 11 - 1, 14, 21)
     // date.setHours(date.getHours() - 7)
     var intervalCoundown = setInterval(() => {
       const countDownTime = date.getTime()
@@ -67,7 +67,7 @@ export default function Countdown() {
       <span className="">New drop is comming soon</span>
       {/* <span className="">Order now !!</span> */}
       <div className="ae-countdown-content mt-4">
-        {/* <div className="ae-countdown-item-container">
+        <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.days }}></span>
           </span>
@@ -90,10 +90,10 @@ export default function Countdown() {
             <span style={{ "--value": countDownTime.seconds }}></span>
           </span>
           <span className="ae-countdown-title">giây</span>
-        </div> */}
-        <div>
-        November 2024
         </div>
+        {/* <div>
+        9pm - 14 November 2024
+        </div> */}
       </div>
     </div>
 

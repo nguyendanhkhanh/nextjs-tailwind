@@ -13,7 +13,7 @@ const ISSERVER = typeof window === "undefined";
 
 function OrderProductList(props: any) {
 
-  const { 
+  const {
     onClickOrder,
     onChangeProduct,
     productRemove,
@@ -22,7 +22,7 @@ function OrderProductList(props: any) {
     onResetOrder,
     isDone,
     onChangeTotalProduct
-   } = props
+  } = props
 
   const [products, setProducts] = useState<ProductType[]>([])
   // const [storageCart, setStorageCart] = useState<CartStorageType[]>(!ISSERVER && JSON.parse(localStorage.getItem('carts') || '[]'))
@@ -154,7 +154,7 @@ function OrderProductList(props: any) {
   }, [isDone])
 
   const getProduct = async () => {
-    const res = await axios.get(HOST + '/api/product-beta?drop=9')
+    const res = await axios.get(HOST + '/api/product-beta?drop=10')
     const data = res.data.data.map((p: any) => {
       return {
         ...p,
@@ -213,6 +213,10 @@ function OrderProductList(props: any) {
 
   return (
     <div className='mt-2 flex flex-col items-center px-2 text-gray-900'>
+      <div className='flex w-100 items-center my-2'>
+        <img className="ms-1 w-6 me-2" src="./instagram.png" />
+        <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
+      </div>
       <div className='flex flex-col items-center'>
         <span className='text-lg '>Danh sách sản phẩm</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
