@@ -228,7 +228,8 @@ function OrderProductList(props: any) {
         ))}
       </div>
 
-      <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}>
+      {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}> */}
+      <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
         Đặt hàng
         <HeartIcon className='w-4' />
         {/* <span className="loading loading-spinner w-4"></span> */}
