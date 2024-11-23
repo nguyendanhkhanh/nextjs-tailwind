@@ -430,7 +430,7 @@ export default function Home() {
         totalPriceAfterDiscount = totalPrice - discountValue
       }
       let depositValue = 0
-      if (payment === 'cod' && totalPrice >= 600000) {
+      if (payment === 'cod' && totalPrice >= 500000) {
         depositValue = toRounded(totalPrice * 0.2)
         console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
       }
@@ -919,7 +919,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      <Transition.Root show={orders.length ? true : false} as={Fragment}>
+      <Transition.Root show={orders.length ? false : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 

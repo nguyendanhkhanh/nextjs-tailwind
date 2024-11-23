@@ -50,6 +50,8 @@ export default function OrderBeta() {
   }
 
   const markDVVC = async (order) => {
+    const content = `${order.info.address} ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}`
+    copy(content)
     await axios.get(HOST + `/api/order/markDVVC?_id=${order._id}`)
     getOrder()
   }
@@ -116,20 +118,20 @@ export default function OrderBeta() {
           <div>STT: {order.stt}</div>
           <div>{moment(order.updateAt).format('DD/MM/YYYY HH:mm')} - {order._id}</div>
           <div className='flex'>
-            <span className="text-center text-lg text-gray-900 font-semibold">{order.info.phone}</span>
+            <span className="text-center text-lg text-white font-semibold">{order.info.phone}</span>
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.info.phone)} />
           </div>
           <div className='flex'>
-            <span className="text-center text-lg text-gray-900 font-semibold">{order.info.name}</span>
+            <span className="text-center text-lg text-white font-semibold">{order.info.name}</span>
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.info.name)} />
           </div>
           <div className='flex'>
-            <span className="text-center text-lg text-gray-900 font-semibold">{order.info.address}</span>
+            <span className="text-center text-lg text-white font-semibold">{order.info.address}</span>
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.info.address)} />
           </div>
 
           <div className='flex'>
-            <span className="text-start text-lg text-gray-900 font-semibold">{order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
+            <span className="text-start text-lg text-white font-semibold">{order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(`${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}`)} />
           </div>
           <div>{order.products.map(p => (
@@ -148,7 +150,7 @@ export default function OrderBeta() {
           {order.info.note ? <div>KHÁCH NOTE: {order.info.note}</div> : <></>}
 
           {order.statusMessage === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' onClick={() => sendMessage(order)}>Đã gửi TN</button> : <button className='bg-white text-gray-800 p-2 ms-3' onClick={() => sendMessage(order)}>message</button>}
-          {order.statusLogistic === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' >Đã lên ĐVVC</button> : <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Đánh dấu đã lên ĐVVC</button>}
+          {order.statusLogistic === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)} >Đã lên ĐVVC</button> : <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Đánh dấu đã lên ĐVVC</button>}
 
           {/* <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Hủy đơn</button> */}
 
@@ -157,7 +159,7 @@ export default function OrderBeta() {
             Amanda xác nhận đơn đặt hàng thành công gồm có: <br />
             <div className="mt-2 flex flex-col text-sm text-gray-500">
               {order.products.map((prod, i) => (
-                <div className="flex items-center justify-between" key={i}>
+                <div className="flex items-center justify-between " key={i}>
                   <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity}): {toThousand(prod.price * prod.quantity)}</span></span>
                 </div>
               ))}
