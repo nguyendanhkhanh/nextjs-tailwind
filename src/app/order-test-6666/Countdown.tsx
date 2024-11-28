@@ -92,7 +92,8 @@ export default function Countdown() {
           <span className="ae-countdown-title">giây</span>
         </div> */}
         <div>
-        20:30 November 28th, 2024
+        {/* 20:30 November 28th, 2024 */}
+        Shop now!! ❤️‍🔥
         </div>
       </div>
     </div>

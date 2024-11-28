@@ -292,8 +292,7 @@ export default function Home() {
     })
     setCarts(cartsConvert)
 
-    const existCami = carts.find(c => c.name === 'Cami tặng kèm')
-    console.log("🚀 ~ submitOrder ~ existCami:", existCami)
+    const existCami = cartsConvert.find(c => c.name === 'Cami tặng kèm')
     if (existCami && cartsConvert.length === 1) {
       return setCamiErr('Cami chỉ được tặng kèm khi mua cùng sản phẩm khác')
     }
@@ -640,8 +639,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -734,25 +733,25 @@ export default function Home() {
                           </div>
                           {step < 3 && <span className="text-mini italic text-start" >{isFreeship(totalPrice) ? '(freeship với đơn trên 800k)' : '(chưa gồm phí ship)'}</span>}
 
-                          {totalPrice >= 500000 &&
+                          {/* {totalPrice >= 500000 &&
                             <>
                               <div className="flex justify-between items-center">
                                 <span className="font-semibold mt-1">Quà tặng kèm:</span>
-                                {/* {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
+                                {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
                                   <option value={'Kẹp tóc hoa lan ngẫu nhiên'} disabled>Kẹp tóc hoa lan ngẫu nhiên</option>
                                   <option value='Kẹp tóc hoa lan tím pastel'>Kẹp tóc tím pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng pastel'>Kẹp tóc hồng pastel</option>
                                   <option value='Kẹp tóc hoa lan màu xanh pastel'>Kẹp tóc xanh pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng'>Kẹp tóc hồng</option>
                                   <option value='Kẹp tóc hoa lan màu trắng'>Kẹp tóc trắng</option>
-                                </select>} */}
+                                </select>}
                                 {step < 3 &&
                                   <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>
                                 }
                                 {step === 3 && <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>}
                               </div>
                               {step < 3 && <span className="text-mini italic text-start" >(tặng kèm với đơn trên 500k)</span>}
-                            </>}
+                            </>} */}
                           {step === 3 && deposite ?
                             <>
                               <div className="flex items-center justify-between mt-1  text-warning">
