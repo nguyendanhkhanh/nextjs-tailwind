@@ -235,7 +235,7 @@ export default function Home() {
         stt: index + 1
       }))
     list.reverse()
-    // setOrders(list)
+    setOrders(list)
   }
 
   const onOpenCart = (carts: CartType[], totalPrice = 0) => {
