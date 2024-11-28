@@ -16,6 +16,7 @@ import { HOST, ISSERVER } from "@/lib/config";
 import CountDownComplete from "@/components/CountDownComplete";
 import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
 import moment from 'moment'
+import DialogError from "@/components/DialogError";
 
 export default function Home() {
 
@@ -86,6 +87,8 @@ export default function Home() {
 
 
   const [orders, setOrders] = useState<any[]>([])
+
+  const [camiErr, setCamiErr] = useState('')
 
 
   useEffect(() => {
@@ -232,7 +235,7 @@ export default function Home() {
         stt: index + 1
       }))
     list.reverse()
-    setOrders(list)
+    // setOrders(list)
   }
 
   const onOpenCart = (carts: CartType[], totalPrice = 0) => {
@@ -264,6 +267,7 @@ export default function Home() {
   }
 
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
+
     setIsDone(false)
     setTrackingClickOrder(false)
     const cartsOrder = carts.filter(product => {
@@ -287,6 +291,13 @@ export default function Home() {
       })
     })
     setCarts(cartsConvert)
+
+    const existCami = carts.find(c => c.name === 'Cami tặng kèm')
+    console.log("🚀 ~ submitOrder ~ existCami:", existCami)
+    if (existCami && cartsConvert.length === 1) {
+      return setCamiErr('Cami chỉ được tặng kèm khi mua cùng sản phẩm khác')
+    }
+
     setTotalPrice(totalPrice)
     setStep(1)
     setDialogConfirm(true)
@@ -630,7 +641,7 @@ export default function Home() {
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
                 {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -847,15 +858,15 @@ export default function Home() {
                             </div>
 
                             <div className=" flex flex-col text-gray-600 my-4">
-                            <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                              Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
-                            </Dialog.Title>
-                            <label className="label flex justify-start cursor-pointer pb-0">
-                              <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
-                              <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
-                            </label>
-                            <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
-                          </div>
+                              <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                                Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
+                              </Dialog.Title>
+                              <label className="label flex justify-start cursor-pointer pb-0">
+                                <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
+                                <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
+                              </label>
+                              <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
+                            </div>
 
                           </div>
                         </div>}
@@ -979,6 +990,7 @@ export default function Home() {
       </Transition.Root>
 
       <DialogCancelOrderSuccess visible={dialogCancelOrder} />
+      <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')}  />
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">

@@ -64,8 +64,8 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-      {/* <span className="">New drop is comming soon</span> */}
-      <span className="">Sold out !!</span>
+      <span className="">Black Friday drop</span>
+      {/* <span className="">Sold out !!</span> */}
       <div className="ae-countdown-content mt-4">
         {/* <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
@@ -92,7 +92,7 @@ export default function Countdown() {
           <span className="ae-countdown-title">giây</span>
         </div> */}
         <div>
-        14 November 2024
+        20:30 November 28th, 2024
         </div>
       </div>
     </div>
