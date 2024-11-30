@@ -16,6 +16,7 @@ import { HOST, ISSERVER } from "@/lib/config";
 import CountDownComplete from "@/components/CountDownComplete";
 import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
 import moment from 'moment'
+import DialogError from "@/components/DialogError";
 
 export default function Home() {
 
@@ -86,6 +87,8 @@ export default function Home() {
 
 
   const [orders, setOrders] = useState<any[]>([])
+
+  const [camiErr, setCamiErr] = useState('')
 
 
   useEffect(() => {
@@ -264,6 +267,7 @@ export default function Home() {
   }
 
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
+
     setIsDone(false)
     setTrackingClickOrder(false)
     const cartsOrder = carts.filter(product => {
@@ -287,6 +291,12 @@ export default function Home() {
       })
     })
     setCarts(cartsConvert)
+
+    const existCami = cartsConvert.find(c => c.name === 'Cami tặng kèm')
+    if (existCami && cartsConvert.length === 1) {
+      return setCamiErr('Cami chỉ được tặng kèm khi mua cùng sản phẩm khác')
+    }
+
     setTotalPrice(totalPrice)
     setStep(1)
     setDialogConfirm(true)
@@ -731,25 +741,25 @@ export default function Home() {
                           </div>
                           {step < 3 && <span className="text-mini italic text-start" >{isFreeship(totalPrice) ? '(freeship với đơn trên 800k)' : '(chưa gồm phí ship)'}</span>}
 
-                          {totalPrice >= 500000 &&
+                          {/* {totalPrice >= 500000 &&
                             <>
                               <div className="flex justify-between items-center">
                                 <span className="font-semibold mt-1">Quà tặng kèm:</span>
-                                {/* {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
+                                {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
                                   <option value={'Kẹp tóc hoa lan ngẫu nhiên'} disabled>Kẹp tóc hoa lan ngẫu nhiên</option>
                                   <option value='Kẹp tóc hoa lan tím pastel'>Kẹp tóc tím pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng pastel'>Kẹp tóc hồng pastel</option>
                                   <option value='Kẹp tóc hoa lan màu xanh pastel'>Kẹp tóc xanh pastel</option>
                                   <option value='Kẹp tóc hoa lan màu hồng'>Kẹp tóc hồng</option>
                                   <option value='Kẹp tóc hoa lan màu trắng'>Kẹp tóc trắng</option>
-                                </select>} */}
+                                </select>}
                                 {step < 3 &&
                                   <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>
                                 }
                                 {step === 3 && <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>}
                               </div>
                               {step < 3 && <span className="text-mini italic text-start" >(tặng kèm với đơn trên 500k)</span>}
-                            </>}
+                            </>} */}
                           {step === 3 && deposite ?
                             <>
                               <div className="flex items-center justify-between mt-1  text-warning">
@@ -987,6 +997,7 @@ export default function Home() {
       </Transition.Root>
 
       <DialogCancelOrderSuccess visible={dialogCancelOrder} />
+      <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')}  />
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">

@@ -199,7 +199,7 @@ function OrderProductList(props: any) {
         <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
       </div>
       <div className='flex flex-col items-center'>
-        <span className='text-lg '>Order List</span>
+        <span className='text-lg '>Product List</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
       </div>
 
