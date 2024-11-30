@@ -549,7 +549,7 @@ export default function Home() {
         }}>
           {/* <img className="w-8" src="./united-kingdom.png" /> */}
           <div className="flex align-center font-semibold">
-            <img className="w-8" src="./united-kingdom.png" />
+            <img className="w-8" src="./earth.png" />
             <span className="mt-1 ms-1">EN</span>
           </div>
         </div>
