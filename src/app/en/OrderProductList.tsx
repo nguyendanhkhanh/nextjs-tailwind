@@ -135,7 +135,7 @@ function OrderProductList(props: any) {
   }, [isDone])
 
   const getProduct = async () => {
-    const res = await axios.get(HOST + '/api/product-beta?drop=BF24')
+    const res = await axios.get(HOST + '/api/product-beta?drop=10')
     const data = res.data.data.map((p: any) => {
       return {
         ...p,
@@ -199,7 +199,7 @@ function OrderProductList(props: any) {
         <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
       </div>
       <div className='flex flex-col items-center'>
-        <span className='text-lg '>Danh sách sản phẩm</span>
+        <span className='text-lg '>Product List</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
       </div>
 
@@ -211,7 +211,7 @@ function OrderProductList(props: any) {
 
       <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}>
       {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}> */}
-        Đặt hàng
+        Order now
         <HeartIcon className='w-4' />
       </button>
 

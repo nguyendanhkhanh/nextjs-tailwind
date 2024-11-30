@@ -63,7 +63,7 @@ body {
 
 /* countdown */
 .ae-countdown-container {
-  @apply bg-white rounded-lg px-6 pt-3 pb-6 w-80 text-center text-xl text-gray-900
+  @apply bg-white rounded-lg px-6 pt-3 pb-6 w-96 text-center text-xl text-gray-900
 }
 
 .ae-countdown-content {

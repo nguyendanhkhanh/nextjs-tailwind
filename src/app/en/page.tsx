@@ -1,14 +1,13 @@
 'use client'
 
-import Image from "next/image";
 import Countdown from "@/app/order-test-6666/Countdown";
-import OrderProductList from "@/app/order-test-6666/OrderProductList";
+import OrderProductList from "./OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
+import { DocumentDuplicateIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
-import { CartRequest, CartType } from "@/interface/Product";
-import { calculateShip, generateRandomString, toCurrency, toRounded, toThousand, validatePhone } from "@/lib/utils";
+import { CartType } from "@/interface/Product";
+import { calculateShip, generateRandomString, toRounded, toThousand, validatePhone } from "@/lib/utils";
 import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
@@ -16,7 +15,6 @@ import { HOST, ISSERVER } from "@/lib/config";
 import CountDownComplete from "@/components/CountDownComplete";
 import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
 import moment from 'moment'
-import DialogError from "@/components/DialogError";
 
 export default function Home() {
 
@@ -28,7 +26,6 @@ export default function Home() {
 
   const [deviceCode, setDeviceCode] = useState('');
 
-  const [loading, setLoading] = useState(false)
   const [dialogConfirm, setDialogConfirm] = useState(false)
   const [carts, setCarts] = useState<any[]>([])
   const [totalProduct, setTotalProduct] = useState(0)
@@ -51,6 +48,7 @@ export default function Home() {
     phone: '',
     name: '',
     address: '',
+    country: 'VN',
     province: {
       code: '',
       name: ''
@@ -63,8 +61,9 @@ export default function Home() {
       code: '',
       name: ''
     },
+    postal: '',
     note: '',
-    gift: 'Kẹp tóc hoa lan ngẫu nhiên'
+    gift: ''
   })
   const [phoneWarning, setPhoneWarning] = useState('')
   const [addressAll, setAddressAll] = useState<any>(null)
@@ -87,8 +86,6 @@ export default function Home() {
 
 
   const [orders, setOrders] = useState<any[]>([])
-
-  const [camiErr, setCamiErr] = useState('')
 
 
   useEffect(() => {
@@ -267,7 +264,6 @@ export default function Home() {
   }
 
   const onOpenModalConfirm = (carts: CartType[], totalPrice = 0) => {
-
     setIsDone(false)
     setTrackingClickOrder(false)
     const cartsOrder = carts.filter(product => {
@@ -291,12 +287,6 @@ export default function Home() {
       })
     })
     setCarts(cartsConvert)
-
-    const existCami = cartsConvert.find(c => c.name === 'Cami tặng kèm')
-    if (existCami && cartsConvert.length === 1) {
-      return setCamiErr('Cami chỉ được tặng kèm khi mua cùng sản phẩm khác')
-    }
-
     setTotalPrice(totalPrice)
     setStep(1)
     setDialogConfirm(true)
@@ -326,18 +316,6 @@ export default function Home() {
 
   const setInfoPhone = async (value: string) => {
     setInfo({ ...info, phone: value })
-    // if (!validatePhone(value)) {
-    //   setPhoneWarning('Hãy nhập SĐT đúng')
-    //   setDiscountPercent(0)
-    // } else {
-    //   setPhoneWarning('')
-    //   const res = await axios.get(HOST + '/api/customer?phone=' + value)
-    //   if (res.data.data) {
-    //     setDiscountPercent(res.data.data.discount)
-    //   } else {
-    //     setDiscountPercent(0)
-    //   }
-    // }
   }
 
   const updateProvince = (code: string) => {
@@ -358,15 +336,6 @@ export default function Home() {
           name: ''
         }
       })
-      // const districtList: any[] = []
-      // p.children.forEach((it: string) => {
-      //   const dist = addressAll.districts[it]
-      //   districtList.push({
-      //     ...dist,
-      //     code: it
-      //   })
-      // })
-      // setDistricts(districtList)
     }
   }
 
@@ -383,15 +352,6 @@ export default function Home() {
         name: ''
       }
     })
-    // const wardList: any[] = []
-    // d.children.forEach((it: string) => {
-    //   const w = addressAll.wards[it]
-    //   wardList.push({
-    //     ...w,
-    //     code: it
-    //   })
-    // })
-    // setWards(wardList)
   }
 
   const updateWard = (code: string) => {
@@ -409,9 +369,6 @@ export default function Home() {
   const nextStep = () => {
 
     setTimeout(() => {
-      // if (bottomRef.current) {
-      //   bottomRef.current.scrollIntoView({ behavior: 'smooth' });
-      // }
       if (divRef.current) {
         const scrollPosition = divRef.current.scrollHeight - divRef.current.clientHeight - (step === 1 ? 20 : 40);
         divRef.current.scrollTo({ top: scrollPosition, behavior: 'smooth' });
@@ -461,7 +418,6 @@ export default function Home() {
     }
 
     if (step === 3) {
-      // calculateOrder()
       customerCompleteOrder()
       setStep(step + 1)
     }
@@ -469,7 +425,6 @@ export default function Home() {
   }
 
   const submitOrder = async (shipValue: number, depositValue: number) => {
-    // eventEmitter.emit('reloadProducts')
 
     const res = await axios.post(HOST + '/api/order', {
       carts: carts,
@@ -505,7 +460,6 @@ export default function Home() {
       var timeoutCancel = setTimeout(() => {
         cancelOrder(resp.cartId)
       }, 5 * 60 * 1000);
-      // }, 10 * 1000);
     }
   }
 
@@ -538,16 +492,6 @@ export default function Home() {
       setDialogCancelOrder(false)
       location.reload()
     }, 3000);
-  }
-
-  const calculateOrder = async () => {
-    await axios.post(HOST + '/api/order/calculate', {
-      carts: carts,
-      info: info,
-      deviceCode: deviceCode,
-      cartId: cartId,
-      payment: payment,
-    })
   }
 
   const customerCompleteOrder = async () => {
@@ -601,13 +545,13 @@ export default function Home() {
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
         <div className="cursor-pointer" onClick={() => {
-          window.location.href = 'https://amandaera.com/en';
+          window.location.href = 'https://amandaera.com/';
         }}>
+          {/* <img className="w-8" src="./united-kingdom.png" /> */}
           <div className="flex align-center font-semibold">
-            <img className="w-8" src="./vietnam.png" />
-            <span className="mt-1 ms-1">VI</span>
+            <img className="w-8" src="./united-kingdom.png" />
+            <span className="mt-1 ms-1">EN</span>
           </div>
-          {/* <img className="w-8" src="./vietnam.png" /> */}
         </div>
         <img className="w-40" src="./logo-square.png" />
         <div className="dropdown dropdown-end">
@@ -618,7 +562,7 @@ export default function Home() {
           </div>
 
           <div tabIndex={0} className="menu dropdown-content bg-white z-[1]  mt-4 w-80 pr-2 shadow text-center min-h-64">
-            <span className="text-xl font-semibold mb-2">GIỎ HÀNG</span>
+            <span className="text-xl font-semibold mb-2">CARTS</span>
             {carts.length
               ?
               <>
@@ -641,22 +585,22 @@ export default function Home() {
                 </div>
 
                 <div className="flex  justify-between mt-4 px-1 text-md">
-                  <span className="">Tổng tiền:</span>
+                  <span className="">Total:</span>
                   <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
                 </div>
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
-                  Đặt hàng
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                  {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}> */}
+                  Purchase
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
                 </button>
               </>
-              : <div className="flex flex-col items-center justify-center py-6">
+              : <div className="flex flex-col items-center justify-center py-6">``
                 <ShoppingBagIcon className="h-24 w-24 text-gray-300 mb-3" />
-                <span>Chưa có sản phẩm trong giỏ hàng</span>
+                <span>No product in cart</span>
               </div>}
           </div>
         </div>
@@ -719,67 +663,32 @@ export default function Home() {
                             </div>
                           ))}
                           {step === 3 && discount ? <div className="flex items-center justify-between mt-1 italic">
-                            <span className="font-semibold ">Giảm giá:</span>
+                            <span className="font-semibold ">Discount:</span>
                             <span className="font-semibold ms-2">- {toThousand(discount)}</span>
                           </div> : <></>}
                           {step === 3 && <div className="flex items-center justify-between mt-1">
-                            <span className="font-semibold">Phí ship:</span>
+                            <span className="font-semibold">Shipping fee:</span>
                             <span className="font-semibold ms-2">{toThousand(ship)}</span>
                           </div>}
 
                           <div className="flex items-center justify-between mt-1">
                             {step < 3 &&
                               <>
-                                <span className="font-semibold">Tổng tiền:</span>
+                                <span className="font-semibold">Total:</span>
                                 <span className="font-semibold ms-2">{toThousand(totalPrice)}</span>
                               </>}
                             {step >= 3 &&
                               <>
-                                <span className="font-semibold">Tổng tiền:</span><br />
+                                <span className="font-semibold">Total:</span><br />
                                 <span className="font-semibold ms-2">{toThousand(totalAmount)}</span>
                               </>}
                           </div>
-                          {step < 3 && <span className="text-mini italic text-start" >{isFreeship(totalPrice) ? '(freeship với đơn trên 800k)' : '(chưa gồm phí ship)'}</span>}
 
-                          {/* {totalPrice >= 500000 &&
-                            <>
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold mt-1">Quà tặng kèm:</span>
-                                {step < 3 && <select className="select select-sm rounded-sm  w-52" value={""} onChange={e => setInfo({ ...info, gift: e.target.value })}>
-                                  <option value={'Kẹp tóc hoa lan ngẫu nhiên'} disabled>Kẹp tóc hoa lan ngẫu nhiên</option>
-                                  <option value='Kẹp tóc hoa lan tím pastel'>Kẹp tóc tím pastel</option>
-                                  <option value='Kẹp tóc hoa lan màu hồng pastel'>Kẹp tóc hồng pastel</option>
-                                  <option value='Kẹp tóc hoa lan màu xanh pastel'>Kẹp tóc xanh pastel</option>
-                                  <option value='Kẹp tóc hoa lan màu hồng'>Kẹp tóc hồng</option>
-                                  <option value='Kẹp tóc hoa lan màu trắng'>Kẹp tóc trắng</option>
-                                </select>}
-                                {step < 3 &&
-                                  <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>
-                                }
-                                {step === 3 && <span className="mt-1">Kẹp tóc hoa lan ngẫu nhiên</span>}
-                              </div>
-                              {step < 3 && <span className="text-mini italic text-start" >(tặng kèm với đơn trên 500k)</span>}
-                            </>} */}
-                          {step === 3 && deposite ?
-                            <>
-                              <div className="flex items-center justify-between mt-1  text-warning">
-                                <span className="font-semibold">Cọc 20%:</span>
-                                <span className="font-semibold ms-2">{toThousand(deposite)}</span>
-                              </div>
-                              <div className="flex items-center justify-between mt-1 text-success">
-                                <span className="font-semibold">Tổng tiền thanh toán COD:</span>
-                                <span className="font-semibold ms-2">{toThousand(totalPayment)}</span>
-                              </div>
-                            </>
-                            : <></>
-                          }
-
-                          {/* <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span> */}
                         </div>
 
                         {step === 3 && (payment === 'ck' || deposite) ? <div className="flex flex-col">
                           <Dialog.Title as="h3" className="font-semibold leading-6 mt-2 text-gray-500 flex justify-start">
-                            {deposite ? 'Thông tin chuyển khoản cọc' : 'Thông tin chuyển khoản'}:
+                            {'Payment information'}:
                           </Dialog.Title>
                           <span className="text-mini italic text-red-500 text-left">(Quét mã QR dưới để ck, sau khi ck babi nhớ chụp màn hình r gửi qua IG cho Amanda nha)</span>
                           <img src={urlQr}
@@ -795,7 +704,7 @@ export default function Home() {
                         <div className="mt-2 text-center sm:mt-0 sm:text-left">
 
                           <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 mt-4">
-                            Thông tin của nàng:
+                            Your infomation:
                           </Dialog.Title>
                           <div className="text-gray-800">
 
@@ -803,40 +712,41 @@ export default function Home() {
                               ...info,
                               ig: e.target.value
                             })} />
-                            <input type="text" placeholder="Số điện thoại" className="ae-input" value={info.phone} onChange={(e) => setInfoPhone(e.target.value)} />
+                            <input type="text" placeholder="Phone number" className="ae-input" value={info.phone} onChange={(e) => setInfoPhone(e.target.value)} />
                             {discountPercent ? <span className="text-mini italic text-start text-green-600" >(được giảm {discountPercent}% feedback)</span> : <span></span>}
                             {phoneWarning && <span className="text-mini italic text-start text-red-500" >{phoneWarning}</span>}
 
-                            <input type="text" placeholder="Tên" className="ae-input" value={info.name} onChange={(e) => setInfo({
+                            <input type="text" placeholder="Full name" className="ae-input" value={info.name} onChange={(e) => setInfo({
                               ...info,
                               name: e.target.value
                             })} />
 
-                            <select className="ae-select w-full" value={info.province.code} onChange={e => updateProvince(e.target.value)}>
-                              <option value={''} disabled>Tỉnh / Thành phố</option>
-                              {provinces.map(p => (
-                                <option key={p.code} value={p.code}>{p.name}</option>
-                              ))}
-                            </select>
+                            <input type="text" placeholder="Country" className="ae-input" value={info.country} onChange={(e) => setInfo({
+                              ...info,
+                              country: e.target.value
+                            })} />
 
-                            <div className="flex justify-between w-full">
-                              <select className="ae-select w-[150px]" value={info.district.code} onChange={e => updateDistrict(e.target.value)}>
-                                <option disabled value={''}>Quận / Huyện</option>
-                                {districts.map(d => (
-                                  <option key={d.code} value={d.code}>{d.name}</option>
-                                ))}
-                              </select>
-                              <select className="ae-select w-[150px]" value={info.ward.code} onChange={e => updateWard(e.target.value)}>
-                                <option value={''} disabled>Xã / Phường</option>
-                                {wards.map(p => (
-                                  <option key={p.code} value={p.code}>{p.name}</option>
-                                ))}
-                              </select>
-                            </div>
+                            <input type="text" placeholder="State/Province/Region:" className="ae-input" value={info.province.name} onChange={(e) => setInfo({
+                              ...info,
+                              'province.name': e.target.value
+                            })} />
+                            <input type="text" placeholder="City/District" className="ae-input" value={info.district} onChange={(e) => setInfo({
+                              ...info,
+                              'district.name': e.target.value
+                            })} />
+                            <input type="text" placeholder="Ward/Street" className="ae-input" value={info.ward} onChange={(e) => setInfo({
+                              ...info,
+                              'ward.name': e.target.value
+                            })} />
 
-                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4" style={{ fontSize: '16px' }} value={info.address} onChange={(e) => setInfo({
+                            <textarea placeholder="Detailed address" className="ae-textarea mt-4" style={{ fontSize: '16px' }} value={info.address} onChange={(e) => setInfo({
                               ...info,
                               address: e.target.value
+                            })} />
+
+                            <input type="text" placeholder="Postal Code" className="ae-input" value={info.postal} onChange={(e) => setInfo({
+                              ...info,
+                              'postal': e.target.value
                             })} />
 
                             <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2" style={{ fontSize: '16px' }} value={info.note} onChange={(e) => setInfo({
@@ -845,34 +755,21 @@ export default function Home() {
                             })} />
 
                             <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 my-2">
-                              Hình thức thanh toán:
+                              Payment method:
                             </Dialog.Title>
                             <div className="flex items-center justify-around">
                               <div className=" flex flex-col">
                                 <div className="flex items-center">
                                   <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
-                                  <span>CK full</span>
+                                  <span>Paypal</span>
                                 </div>
-                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-4" >(phí ship {toThousand(calculateShip(info.province.code, 'ck', totalPrice))})</span>}
                               </div>
                               <div className=" flex flex-col">
                                 <div className="flex items-center ">
-                                  <input type="radio" name="radio-1" className="radio me-2" value='cod' checked={payment === 'cod'} onChange={e => setPayment('cod')} />
-                                  <span>COD</span>
+                                  <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
+                                  <span>Remitly</span>
                                 </div>
-                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-3" >(phí ship {toThousand(calculateShip(info.province.code, 'cod', totalPrice))})</span>}
                               </div>
-                            </div>
-
-                            <div className=" flex flex-col text-gray-600 my-4">
-                              <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                                Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
-                              </Dialog.Title>
-                              <label className="label flex justify-start cursor-pointer pb-0">
-                                <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
-                                <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
-                              </label>
-                              <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
                             </div>
 
                           </div>
@@ -898,12 +795,6 @@ export default function Home() {
                     </div>
                     <div ref={bottomRef} />
                   </div>
-
-                  {/* <div className="text-sm font-semibold text-gray-900">
-                    Sản phẩm đã hết:
-                    {soldout.map(p => (<div>{p.name}</div>))}
-                  </div> */}
-
                   <div className="bg-white px-4 py-3 flex justify-between ">
                     {step < 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => {
                       if (step === 1) {
@@ -915,19 +806,19 @@ export default function Home() {
                       }
                       setStep(step - 1)
                     }}>
-                      Quay lại
+                      Back
                     </button>}
                     {step === 3 && <button className="btn mx-2 bg-white text-gray-900" onClick={() => cancelOrder(cartId)}>
-                      Hủy đơn
+                      Cancel order
                     </button>}
                     {step < 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" disabled={!carts.length} onClick={() => nextStep()}>
-                      Tiếp tục
+                      Continue
                     </button>}
                     {step === 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
-                      {(payment === 'ck' || deposite) ? 'Đã chuyển khoản' : 'Xác nhận'}
+                      {payment === 'ck' ? 'Transferred' : 'Confirm'}
                     </button>}
                     {step === 4 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => done()}>
-                      Hoàn tất
+                      Complete
                     </button>}
                   </div>
                 </Dialog.Panel>
@@ -955,16 +846,16 @@ export default function Home() {
                 <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all  w-[360px]">
                   <div ref={divRef} className="bg-white max-h-[70vh] overflow-y-auto px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                      Nàng đang có {orders.length} đơn hàng:
+                      You have {orders.length} orders:
                     </Dialog.Title>
                     {orders.map((order, index) => (<div className='mb-6 text-gray-900 mt-2 text-sm' key={order._id}>
                       <div className="text-gray-600 text-sm italic">{moment(order.updateAt).format('DD/MM/YYYY HH:mm')}</div>
                       <div className='flex '>
-                        <span className="text-md text-gray-900 font-semibold me-1">Người nhận: </span>
+                        <span className="text-md text-gray-900 font-semibold me-1">Infomation: </span>
                         <span className="text-center text-md text-gray-900">{order.info.name} - {order.info.phone}</span>
                       </div>
                       <div className='flex'>
-                        <span className="text-start text-md text-gray-900"><span className="font-semibold">Địa chỉ: </span>{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
+                        <span className="text-start text-md text-gray-900"><span className="font-semibold">Address: </span>{order.info.address}, {order.info.ward.name}, {order.info.district.name}, {order.info.province.name}</span>
                       </div>
                       {order.info.note
                         ? <div className='flex mb-2'>
@@ -972,12 +863,12 @@ export default function Home() {
                         </div>
                         : <></>
                       }
-                      <span className="text-md text-gray-900 font-semibold me-1 ">Danh sách sản phẩm: </span>
+                      <span className="text-md text-gray-900 font-semibold me-1 ">Product List: </span>
                       <div>{order.products.map(p => (
                         <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
-                      <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
-                        {order.statusMessage == 0 && !isMoreThan10Minutes(order.updateAt, new Date().toISOString()) ? <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button> : <></>}
+                      <div className="font-semibold">Total: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
+                        {order.statusMessage == 0 && !isMoreThan10Minutes(order.updateAt, new Date().toISOString()) ? <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Cancel order</button> : <></>}
                       </div>
                       <div>----------------------------------------------------</div>
                     </div>))}
@@ -986,7 +877,7 @@ export default function Home() {
 
                   <div className="bg-white px-4 py-3 flex justify-between ">
                     {orders.length < 2 ? <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => { if (orders.length < 2) setOrders([]) }}>
-                      Đồng ý
+                      Confirm
                     </button> : <></>}
                   </div>
                 </Dialog.Panel>
@@ -997,7 +888,6 @@ export default function Home() {
       </Transition.Root>
 
       <DialogCancelOrderSuccess visible={dialogCancelOrder} />
-      <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')}  />
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">
