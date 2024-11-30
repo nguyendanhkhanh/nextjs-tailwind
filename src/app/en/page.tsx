@@ -544,7 +544,15 @@ export default function Home() {
   return (
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
-        <div></div>
+        <div className="cursor-pointer" onClick={() => {
+          window.location.href = 'https://amandaera.com/';
+        }}>
+          {/* <img className="w-8" src="./united-kingdom.png" /> */}
+          <div className="flex align-center font-semibold">
+            <img className="w-8" src="./united-kingdom.png" />
+            <span className="mt-1 ms-1">EN</span>
+          </div>
+        </div>
         <img className="w-40" src="./logo-square.png" />
         <div className="dropdown dropdown-end">
           {/* <div  role="button" className="btn btn-ghost rounded-btn">Dropdown</div> */}
@@ -590,9 +598,9 @@ export default function Home() {
                   {/* <span className="loading loading-spinner w-4"></span> */}
                 </button>
               </>
-              : <div className="flex flex-col items-center justify-center py-6">
+              : <div className="flex flex-col items-center justify-center py-6">``
                 <ShoppingBagIcon className="h-24 w-24 text-gray-300 mb-3" />
-                <span>Chưa có sản phẩm trong giỏ hàng</span>
+                <span>No product in cart</span>
               </div>}
           </div>
         </div>

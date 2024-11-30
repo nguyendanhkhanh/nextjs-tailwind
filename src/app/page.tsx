@@ -590,7 +590,15 @@ export default function Home() {
   return (
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
-        <div></div>
+        <div className="cursor-pointer" onClick={() => {
+          window.location.href = 'https://amandaera.com/en';
+        }}>
+          <div className="flex align-center font-semibold">
+            <img className="w-8" src="./vietnam.png" />
+            <span className="mt-1 ms-1">VI</span>
+          </div>
+          {/* <img className="w-8" src="./vietnam.png" /> */}
+        </div>
         <img className="w-40" src="./logo-square.png" />
         <div className="dropdown dropdown-end">
           {/* <div  role="button" className="btn btn-ghost rounded-btn">Dropdown</div> */}
@@ -630,7 +638,7 @@ export default function Home() {
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
                 {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -847,15 +855,15 @@ export default function Home() {
                             </div>
 
                             <div className=" flex flex-col text-gray-600 my-4">
-                            <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                              Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
-                            </Dialog.Title>
-                            <label className="label flex justify-start cursor-pointer pb-0">
-                              <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
-                              <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
-                            </label>
-                            <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
-                          </div>
+                              <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                                Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
+                              </Dialog.Title>
+                              <label className="label flex justify-start cursor-pointer pb-0">
+                                <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
+                                <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
+                              </label>
+                              <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
+                            </div>
 
                           </div>
                         </div>}
