@@ -1,14 +1,21 @@
-export function toCurrency(number = 0) {
+export function toCurrency(number = 0, lang = 'vi') {
   return number
-    ? number.toLocaleString('vi-VN', {
+    ? lang === 'vi' ? number.toLocaleString('vi-VN', {
       style: 'currency',
       currency: 'VND',
+    }) : number.toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD',
     })
-    : '0 đ';
+    : lang === 'vi' ? '0 đ' : '$0';
 }
 
 export function toThousand(number = 0) {
   return Math.round(number / 1000) + 'k'
+}
+
+export function toDollar(number = 0) {
+  return '$' + number
 }
 
 export function toRounded(number = 0) {
@@ -62,6 +69,61 @@ export function calculateShip(proviceCode: string, payment: string, totalPrice =
       }
     }
     default: return 15000
+
+  }
+}
+
+export function calculateShipWorld(country: string) {
+  switch (country) {
+    case 'Cambodia': {
+      return 25
+    }
+    case 'Canada': {
+      return 35
+    }
+    case 'Hongkong': {
+      return 35
+    }
+    case 'India': {
+      return 35
+    }
+    case 'Indonesia': {
+      return 35
+    }
+    case 'Japan': {
+      return 35
+    }
+    case 'Laos': {
+      return 35
+    }
+    case 'Malaysia': {
+      return 35
+    }
+    case 'Philippines': {
+      return 35
+    }
+    case 'Poland': {
+      return 35
+    }
+    case 'Singapore': {
+      return 35
+    }
+    case 'South Korea': {
+      return 35
+    }
+    case 'Taiwan': {
+      return 35
+    }
+    case 'Thailand': {
+      return 35
+    }
+    case 'The UK': {
+      return 35
+    }
+    case 'The US': {
+      return 35
+    }
+    default: return 0
 
   }
 }

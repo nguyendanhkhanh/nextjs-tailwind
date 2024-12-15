@@ -50,7 +50,7 @@ function ProductOrder(props: ProductOrderProps) {
     // Tạo một phần tử mới
     var textElement = document.createElement('div');
     textElement.className = 'hiddenText';
-    textElement.textContent = 'Quá số lượng cho phép';
+    textElement.textContent = 'Over the allowed quantity';
 
     // Thêm phần tử vào container
     var container = document.getElementById(id);
@@ -77,8 +77,8 @@ function ProductOrder(props: ProductOrderProps) {
       <div className='text-center group mb-2'>
         <img className='w-48 h-64 object-cover rounded-t-xl' src={product.image} />
         <div className='flex flex-col w-full bg-white group-hover:opacity-100 rounded-b-xl'>
-          <span className='text-xs font-normal'>{product.name}</span>
-          <span className='text-xs font-semibold'>{toCurrency(product.price)}</span>
+          <span className='text-xs font-normal'>{product.name || '<>'}</span>
+          <span className='text-xs font-semibold'>{toCurrency(product.price, 'en')}</span>
         </div>
       </div>
       {product.units.map((u, idx) => (

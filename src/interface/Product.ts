@@ -1,6 +1,8 @@
 export interface ProductType {
   _id: string
   name: string
+  enName: string
+  enPrice: number
   units: {
     code: string
     quantity: number

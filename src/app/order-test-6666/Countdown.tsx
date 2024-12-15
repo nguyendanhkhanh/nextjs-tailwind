@@ -10,7 +10,7 @@ export default function Countdown() {
 
   const startCountDown = useCallback(() => {
     const customDate = new Date();
-    const date = new Date(2024, 11 - 1, 14, 21)
+    const date = new Date(2024, 12 - 1, 17, 21)
     // date.setHours(date.getHours() - 7)
     var intervalCoundown = setInterval(() => {
       const countDownTime = date.getTime()
@@ -64,35 +64,34 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-      <span className="">November drop sold out ❤️‍🔥</span>
+        Opening: 9pm 17th December 🎅🏻<br/>
       {/* <span className="">Order now !!</span> */}
       <div className="ae-countdown-content mt-4">
-        {/* <div className="ae-countdown-item-container">
+        <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.days }}></span>
           </span>
-          <span className="ae-countdown-title">ngày</span>
+          <span className="ae-countdown-title">days</span>
         </div>
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.hours }}></span>
           </span>
-          <span className="ae-countdown-title">giờ</span>
+          <span className="ae-countdown-title">hours</span>
         </div>
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.minutes }}></span>
           </span>
-          <span className="ae-countdown-title">phút</span>
+          <span className="ae-countdown-title">minutes</span>
         </div>
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.seconds }}></span>
           </span>
-          <span className="ae-countdown-title">giây</span>
-        </div> */}
+          <span className="ae-countdown-title">seconds</span>
+        </div>
         <div>
-        December drop coming soon 🎅🏻<br/>
         </div>
       </div>
     </div>

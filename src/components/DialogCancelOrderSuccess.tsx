@@ -4,7 +4,7 @@ import BackgroundModal from "@/components/BackgroundModal";
 
 const DialogCancelOrderSuccess = (props: any) => {
 
-  const { visible } = props
+  const { visible, lang } = props
   const cancelButtonRef = useRef(null)
   const divRef = useRef(null);
 
@@ -30,7 +30,7 @@ const DialogCancelOrderSuccess = (props: any) => {
                     <img className="w-20" src="./logo-circle.svg" />
                   </div>
                   <Dialog.Title as="h3" className="leading-6 font-semibold text-md text-gray-500 flex justify-start">
-                    Đơn hàng đã được huỷ thành công ❤️
+                    {lang === 'en' ? 'Order canceled❤️ ' : 'Đơn hàng đã được huỷ thành công ❤️'}
                   </Dialog.Title>
 
                 </div>
@@ -39,7 +39,7 @@ const DialogCancelOrderSuccess = (props: any) => {
                   <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => {
                     location.reload()
                   }}>
-                    Đồng ý
+                    {lang === 'en' ? 'Confirm' : 'Đồng ý'}
                   </button>
                 </div>
               </Dialog.Panel>
