@@ -694,7 +694,7 @@ export default function Home() {
                               </div>
                               <div className="flex col  flex-1 ">
                                 <span>Total: </span>
-                                <span className="text-gray-900 ml-1">{toDollar(totalPrice)}</span>
+                                <span className="text-gray-900 ml-1">{toDollar(totalAmount)}</span>
                               </div>
                               <div className="flex flex-1 items-center mt-3">
                                 <span>Username: </span>
@@ -717,14 +717,14 @@ export default function Home() {
                             </div>
                           </div>
                           : <div>
-                            <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please follow ours informations)</span>
+                            {/* <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please follow ours informations)</span> */}
                             <div className="text-sm text-gray-500 font-semibold mt-2">
                               <div className="flex justify-center flex-1">
                                 <img className="w-32" src="https://cdn.remitly.com/images/v1/img/remtily_logo_vertical_midnight_b.6eT0nA18TSlQIsjllF72RN.png" />
                               </div>
                               <div className="flex col  flex-1 ">
                                 <span>Total: </span>
-                                <span className="text-gray-900 ml-1">{toDollar(totalPrice)}</span>
+                                <span className="text-gray-900 ml-1">{toDollar(totalAmount)}</span>
                               </div>
                               <div className="flex col  flex-1 mt-3">
                                 <span>Delivery method: </span>
@@ -887,10 +887,6 @@ export default function Home() {
                           </>
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
                             🎀 Order confirmation message will be sent to you via IG within 5 minutes.
-
-                            Please check and reply us within 10 minutes to complete your order payment ❤️
-
-                            (After 10 minutes, the order will be automatically canceled)
                           </Dialog.Title>
                           <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
@@ -934,7 +930,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      <Transition.Root show={orders.length ? false : false} as={Fragment}>
+      <Transition.Root show={orders.length ? true : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 

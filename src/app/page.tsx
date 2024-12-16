@@ -937,7 +937,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      <Transition.Root show={orders.length ? false : false} as={Fragment}>
+      <Transition.Root show={orders.length ? true : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 
