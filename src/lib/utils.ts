@@ -18,6 +18,10 @@ export function toDollar(number = 0) {
   return '$' + number
 }
 
+export function dollarToVnd(number = 0) {
+  return number * 25500
+}
+
 export function toRounded(number = 0) {
   return Math.round(number / 1000) * 1000
 }
@@ -75,55 +79,34 @@ export function calculateShip(proviceCode: string, payment: string, totalPrice =
 
 export function calculateShipWorld(country: string) {
   switch (country) {
-    case 'Cambodia': {
-      return 25
-    }
-    case 'Canada': {
-      return 35
-    }
-    case 'Hongkong': {
-      return 35
-    }
-    case 'India': {
-      return 35
-    }
-    case 'Indonesia': {
-      return 35
-    }
-    case 'Japan': {
-      return 35
-    }
-    case 'Laos': {
-      return 35
-    }
-    case 'Malaysia': {
-      return 35
-    }
-    case 'Philippines': {
-      return 35
-    }
-    case 'Poland': {
-      return 35
-    }
-    case 'Singapore': {
-      return 35
-    }
-    case 'South Korea': {
-      return 35
-    }
-    case 'Taiwan': {
-      return 35
-    }
-    case 'Thailand': {
-      return 35
-    }
+    case 'Australia': { return 22 }
+    case 'Cambodia': { return 34 }
+    case 'Canada': { return 33 }
+    case 'France': { return 33 }
+    case 'Germany': { return 30 }
+    case 'Hongkong': { return 20 }
+    case 'India': { return 35 }
+    case 'Indonesia': { return 33 }
+    case 'Italy': { return 35 }
+    case 'Japan': { return 35 }
+    case 'Laos': { return 38 }
+    case 'Malaysia': { return 20 }
+    case 'Netherland': { return 32 }
+    case 'Norway': { return 80 }
+    case 'Philippines': { return 21 }
+    case 'Poland': { return 33 }
+    case 'Singapore': { return 25 }
+    case 'South Korea': { return 20 }
+    case 'Sweden': { return 45 }
+    case 'Taiwan': { return 20 }
+    case 'Thailand': { return 32 }
     case 'The UK': {
-      return 35
+      return 32
     }
     case 'The US': {
       return 35
     }
-    default: return 0
+    default: return 35
 
   }
 }

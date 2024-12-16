@@ -7,7 +7,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { DocumentDuplicateIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
 import BackgroundModal from "@/components/BackgroundModal";
 import { CartType } from "@/interface/Product";
-import { calculateShipWorld, generateRandomString, toRounded, toDollar, validatePhone } from "@/lib/utils";
+import { calculateShipWorld, generateRandomString, toRounded, toDollar, validatePhone, dollarToVnd } from "@/lib/utils";
 import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
@@ -71,7 +71,7 @@ export default function Home() {
   const [provinces, setProvinces] = useState<any[]>([])
   const [districts, setDistricts] = useState<any[]>([])
   const [wards, setWards] = useState<any[]>([])
-  const [payment, setPayment] = useState('ck')
+  const [payment, setPayment] = useState('ckPayPal')
   const [urlQr, setUrlQr] = useState('')
   const [cartId, setCartId] = useState('')
   const cartIdRef = useRef(cartId);
@@ -393,25 +393,25 @@ export default function Home() {
         setDiscount(discountValue)
         totalPriceAfterDiscount = totalPrice - discountValue
       }
-      let depositValue = 0
-      if (payment === 'cod' && totalPrice >= 500000) {
-        depositValue = toRounded(totalPrice * 0.2)
-        console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
-      }
-      setDeposite(depositValue)
+      // let depositValue = 0
+      // // if (payment === 'cod' && totalPrice >= 500000) {
+      // //   depositValue = toRounded(totalPrice * 0.2)
+      // //   console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
+      // // }
+      // setDeposite(depositValue)
       const totalAmountValue = totalPriceAfterDiscount + shipValue
       setTotalAmount(totalAmountValue)
-      const totalPaymentValue = totalAmountValue - depositValue
+      const totalPaymentValue = totalAmountValue
       setTotalPayment(totalPaymentValue)
 
-      const bankValue = totalPaymentValue
+      const bankValue = dollarToVnd(totalPaymentValue)
 
       if (bankValue) {
         const url = `https://api.vietqr.io/image/970407-19037257529012-Dgrd4Uv.jpg?accountName=NGUYEN%20DANH%20KHANH&amount=${toRounded(bankValue)}&addInfo=${info.phone}%20${payment === 'ck' ? 'CK%20full' : 'Coc%2020'}`
         setUrlQr(url)
       }
 
-      submitOrder(shipValue, depositValue)
+      submitOrder(shipValue, 0)
     }
 
     if (step === 3) {
@@ -454,9 +454,9 @@ export default function Home() {
       setCartId(resp.cartId)
       setStep(step + 1)
       setStartCountDown(true)
-      var timeoutCancel = setTimeout(() => {
-        cancelOrder(resp.cartId)
-      }, 5 * 60 * 1000);
+      // var timeoutCancel = setTimeout(() => {
+      //   cancelOrder(resp.cartId)
+      // }, 5 * 60 * 1000);
     }
   }
 
@@ -507,9 +507,9 @@ export default function Home() {
     location.reload()
   }
 
-  const copy = () => {
+  const copy = (value = '') => {
     const el = document.createElement("textarea");
-    el.value = '19037257529012';
+    el.value = value;
     document.body.appendChild(el);
     el.select();
     document.execCommand("copy");
@@ -588,8 +588,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(shipping fee not included)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                  <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                  {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}> */}
                   Purchase
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -683,18 +683,82 @@ export default function Home() {
 
                         </div>
 
-                        {step === 3 && (payment === 'ck' || deposite) ? <div className="flex flex-col">
+                        {step === 3 ? <div className="flex flex-col">
                           <Dialog.Title as="h3" className="font-semibold leading-6 mt-2 text-gray-500 flex justify-start">
                             {'Payment information'}:
                           </Dialog.Title>
-                          <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please scan this QR code to pay)</span>
-                          <img src={urlQr}
-                          />
-                          <div className="flex flex-1 items-center justify-center -mt-5">
+                          {payment == 'ckPayPal' ? <div>
+                            <div className="text-sm text-gray-500 font-semibold mt-2">
+                              <div className="flex justify-center flex-1">
+                                <img className="w-24" src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" />
+                              </div>
+                              <div className="flex col  flex-1 ">
+                                <span>Total: </span>
+                                <span className="text-gray-900 ml-1">{toDollar(totalPrice)}</span>
+                              </div>
+                              <div className="flex flex-1 items-center mt-3">
+                                <span>Username: </span>
+                                <div className="flex flex-1 items-center ml-1">
+                                  <span className="text-center text-sm text-gray-900 font-semibold">@kiras98</span>
+                                  <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('@kiras98')} />
+                                </div>
+                              </div>
+                              <div className="flex flex-1 items-center mt-3">
+                                <span>Email: </span>
+                                <div className="flex flex-1 items-center ml-1">
+                                  <span className="text-center text-sm text-gray-900 font-semibold">khanh.nguyendanh.kiras98@gmail.com</span>
+                                  <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('khanh.nguyendanh.kiras98@gmail.com')} />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex flex-1 items-center justify-center mt-4">
+                              <a href="https://paypal.me/kiras98" target="_blank" className="text-center text-sm text-blue-900 font-semibold">paypal.me/kiras98</a>
+                              <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('https://paypal.me/kiras98')} />
+                            </div>
+                          </div>
+                          : <div>
+                            <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please follow ours informations)</span>
+                            <div className="text-sm text-gray-500 font-semibold mt-2">
+                              <div className="flex justify-center flex-1">
+                                <img className="w-32" src="https://cdn.remitly.com/images/v1/img/remtily_logo_vertical_midnight_b.6eT0nA18TSlQIsjllF72RN.png" />
+                              </div>
+                              <div className="flex col  flex-1 ">
+                                <span>Total: </span>
+                                <span className="text-gray-900 ml-1">{toDollar(totalPrice)}</span>
+                              </div>
+                              <div className="flex col  flex-1 mt-3">
+                                <span>Delivery method: </span>
+                                <span className="text-gray-900 ml-1"> Bank deposit</span>
+                              </div>
+                              <div className="flex col flex-1 items-center mt-2">
+                                <span>Recipient's bank: </span>
+                                <div className="flex items-center rounded-sm border px-1 py-1 ml-1">
+                                  <img className="w-12" src="https://dongphucvina.vn/wp-content/uploads/2023/05/logo-techcombank-dongphucvina.vn_.png"></img>
+                                  <span className="text-gray-900 ml-1">Techcombank</span>
+                                </div>
+                              </div>
+                              <div className="flex flex-1 items-center mt-2">
+                                <span>Recipient Bank account: </span>
+                                <div className="flex flex-1 items-center ml-1">
+                                  <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
+                                  <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('19037257529012')} />
+                                </div>
+                              </div>
+                              <div className="flex flex-1 items-start mt-4">
+                                <span>Recipient name: </span>
+                                <div className="flex flex-col items-start">
+                                  <span className="text-gray-900 ml-1">Nguyen - Danh - Khanh</span>
+                                  <span className="italic font-normal">(Family - Middle - Given)</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>}
+
+
+                          {/* <div className="flex flex-1 items-center justify-center mt-5">
                             <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
                             <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={copy} />
-
-                          </div>
+                          </div> */}
                         </div> : <></>}
                       </div>}
                       {step == 2 &&
@@ -719,20 +783,27 @@ export default function Home() {
 
                             <select className="ae-select w-full" value={info.countrySelect} onChange={e => setInfo({ ...info, country: e.target.value, countrySelect: e.target.value })}>
                               <option value='COUNTRY' disabled>Choose your country</option>
-                              <option value='The UK'>The UK</option>
                               <option value='The US'>The US</option>
+                              <option value='The UK'>The UK</option>
+                              <option value='Australia'>Australia</option>
                               <option value='Cambodia'>Cambodia</option>
                               <option value='Canada'>Canada</option>
+                              <option value='France'>France</option>
+                              <option value='Germany'>Germany</option>
                               <option value='Hongkong'>Hongkong</option>
                               <option value='India'>India</option>
                               <option value='Indonesia'>Indonesia</option>
+                              <option value='Italy'>Italy</option>
                               <option value='Japan'>Japan</option>
                               <option value='Laos'>Laos</option>
                               <option value='Malaysia'>Malaysia</option>
+                              <option value='Netherland'>Netherland</option>
+                              <option value='Norway'>Norway</option>
                               <option value='Philippines'>Philippines</option>
                               <option value='Poland'>Poland</option>
                               <option value='Singapore'>Singapore</option>
                               <option value='South Korea'>South Korea</option>
+                              <option value='Sweden'>Sweden</option>
                               <option value='Taiwan'>Taiwan</option>
                               <option value='Thailand'>Thailand</option>
                               {/* <option value=''>Other...</option> */}
@@ -792,13 +863,13 @@ export default function Home() {
                             <div className="flex items-center justify-around">
                               <div className=" flex flex-col">
                                 <div className="flex items-center">
-                                  <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
+                                  <input type="radio" name="radio-1" className="radio me-2" value='ckPayPal' checked={payment === 'ckPayPal'} onChange={e => setPayment('ckPayPal')} />
                                   <span>Paypal</span>
                                 </div>
                               </div>
                               <div className=" flex flex-col">
                                 <div className="flex items-center ">
-                                  <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
+                                  <input type="radio" name="radio-1" className="radio me-2" value='ckRemitly' checked={payment === 'ckRemitly'} onChange={e => setPayment('ckRemitly')} />
                                   <span>Remitly</span>
                                 </div>
                               </div>
@@ -808,13 +879,12 @@ export default function Home() {
                         </div>}
                       {step === 4 &&
                         <div>
-                          {(payment === 'ck' && ship) ? <>
+                          <>
                             <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start">
                               🎀 After completing payment, please send us a screenshot of E-invoice via Instagram
                             </Dialog.Title>
                             <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
-                          </> : <></>
-                          }
+                          </>
                           <Dialog.Title as="h3" className=" leading-6 text-gray-900 flex justify-start ">
                             🎀 Order confirmation message will be sent to you via IG within 5 minutes.
 
@@ -851,7 +921,7 @@ export default function Home() {
                       Continue
                     </button>}
                     {step === 3 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => nextStep()}>
-                      {payment === 'ck' ? 'Transferred' : 'Confirm'}
+                      Transferred
                     </button>}
                     {step === 4 && <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={() => done()}>
                       Complete
