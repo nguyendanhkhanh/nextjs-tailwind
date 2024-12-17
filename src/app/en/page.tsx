@@ -680,6 +680,7 @@ export default function Home() {
                                 <span className="font-semibold ms-2">{toDollar(totalAmount)}</span>
                               </>}
                           </div>
+                          {step < 3 && <span className="text-mini italic text-start" >(shipping fee not included)</span>}
 
                         </div>
 

@@ -64,8 +64,8 @@ export default function Countdown() {
 
   return (
     <div className="ae-countdown-container ">
-        Opening: 9pm 17th December 🎅🏻<br/>
-      <span className="">Order now !!</span>
+        {/* Opening: 9pm 17th December 🎅🏻<br/> */}
+      <span className="text-md">Order now !!</span>
       {/* <div className="ae-countdown-content mt-4">
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
