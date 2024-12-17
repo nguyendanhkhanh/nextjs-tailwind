@@ -42,8 +42,15 @@ export default function OrderBeta() {
   const [message, setMesMage] = useState('')
 
   const sendMessage = async (order) => {
-    const content = `Amanda gửi nàng xác nhận đơn đặt hàng thành công gồm có:\n\n${order.products.map(p => (`${p.name} size ${p.unit} (x${p.quantity}): ${toThousand(p.quantity * p.price)}`)).join('\n')}\n\nPhí ship: ${toThousand(order.ship)}\n${order.info.gift ? `Quà tặng: ${order.info.gift}` : ''}\n${order.totalAmount < order.totalPayment ? `Cọc: ${toThousand(order.totalAmount - order.totalPayment)}` : ''}\nTổng tiền: ${toThousand(order.totalAmount)} ${order.discount ? '(đã bao gồm giảm 5% feedback)' : ''}\nHình thức thanh toán: ${order.payment === 'ck' ? 'Chuyển khoản' : 'COD'}\n\nThông tin nhận hàng:\n${order.info.name}\n${order.info.phone}\n${order.info.address} - ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}\n\nCảm ơn nàng đã mua hàng tại Amanda Era ❤️
+    let content = ''
+    if (order.payment == 'ck' || order.payment == 'cod') {
+      content = `Amanda gửi nàng xác nhận đơn đặt hàng thành công gồm có:\n\n${order.products.map(p => (`${p.name} size ${p.unit} (x${p.quantity}): ${toThousand(p.quantity * p.price)}`)).join('\n')}\n\nPhí ship: ${toThousand(order.ship)}\n${order.totalAmount < order.totalPayment ? `Cọc: ${toThousand(order.totalAmount - order.totalPayment)}` : ''}\nTổng tiền: ${toThousand(order.totalAmount)} ${order.discount ? '(đã bao gồm giảm 5% feedback)' : ''}\nHình thức thanh toán: ${order.payment === 'ck' ? 'Chuyển khoản' : 'COD'}\n\nThông tin nhận hàng:\n${order.info.name}\n${order.info.phone}\n${order.info.address} - ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}\n\nCảm ơn nàng đã mua hàng tại Amanda Era ❤️
     `
+    } else {
+      content = `Your order is confirmed:\n\n${order.products.map(p => (`${p.name} size ${p.unit} (x${p.quantity}): $${(p.quantity * p.price)}`)).join('\n')}\n\nShipping fee: $${order.ship}\n\nTotal: $${(order.totalAmount)}\n\nShipping information:\n${order.info.name}\n${order.info.phone}\n${order.info.address} - ${order.info.ward.name}, ${order.info.district.name}, ${order.info.province.name}\n\nThank you for your order❤️
+    `
+    }
+
     copy(content)
     await axios.get(HOST + `/api/order/markSend?_id=${order._id}&status=${!Number(order.statusMessage) ? 1 : 0}`)
     getOrder()
@@ -137,9 +144,9 @@ export default function OrderBeta() {
           <div>{order.products.map(p => (
             <div key={order._id + p._id + p.unit}>{p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
           ))}</div>
-          <span>Quà tặng: {order.info.gift || 'Không có'}</span>
+          {/* <span>Quà tặng: {order.info.gift || 'Không có'}</span> */}
           <div className='flex'>
-            <span className="text-center text-lg text-green-500 font-semibold">{order.payment === 'cod' ? order.totalAmount : 0}</span> ({order.payment === 'ck' ? 'Chuyển khoản' : 'COD'})
+            <span className="text-center text-lg text-green-500 font-semibold">{order.payment === 'cod' ? order.totalAmount : 0}</span> ({order.payment})
             <DocumentDuplicateIcon className=" ms-1 h-6 w-6 mb-2 text-white cursor-pointer" onClick={() => copy(order.payment === 'cod' ? order.totalAmount : 0)} />
           </div>
           <div className='flex'>
@@ -148,6 +155,7 @@ export default function OrderBeta() {
           </div>
 
           {order.info.note ? <div>KHÁCH NOTE: {order.info.note}</div> : <></>}
+          {order.payment == 'ckPayPal' || order.payment == 'ckRemitly' ? <div>ĐƠN NƯỚC NGOÀI</div> : <></>}
 
           {order.statusMessage === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' onClick={() => sendMessage(order)}>Đã gửi TN</button> : <button className='bg-white text-gray-800 p-2 ms-3' onClick={() => sendMessage(order)}>message</button>}
           {order.statusLogistic === 1 ? <button className='bg-green-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)} >Đã lên ĐVVC</button> : <button className='bg-red-500 text-gray-800 p-2 ms-3' onClick={() => markDVVC(order)}>Đánh dấu đã lên ĐVVC</button>}
@@ -165,7 +173,7 @@ export default function OrderBeta() {
               ))}
               <span style={{ "whiteSpace": "pre-wrap" }}>{`\n`}</span>
               <div>Phí ship: {toThousand(order.ship)}</div>
-              {order.info.gift ? <div>Quà tặng: {order.info.gift}</div> : <></>}
+              {/* {order.info.gift ? <div>Quà tặng: {order.info.gift}</div> : <></>} */}
               {order.totalAmount < order.totalPayment ? <div>Cọc: {toThousand(order.totalAmount - order.totalPayment)}</div> : <></>}
               <div className="flex items-center justify-between mt-1">
                 <span className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} {order.discount ? '(đã bao gồm giảm 5% feedback)' : ''}</span>

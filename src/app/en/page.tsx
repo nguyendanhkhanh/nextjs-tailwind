@@ -588,8 +588,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(shipping fee not included)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                  <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                  {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}> */}
                   Purchase
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -645,7 +645,7 @@ export default function Home() {
                       }
                       {step < 4 && <div className="mt-4 text-center sm:mt-0 sm:text-left">
                         <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
-                          Your order is confirmed:
+                          Order confirmed:
                         </Dialog.Title>
                         <div className="mt-2 flex flex-col text-sm text-gray-500">
                           {carts.map((prod, i) => (
