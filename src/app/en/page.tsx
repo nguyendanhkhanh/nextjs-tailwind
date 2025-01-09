@@ -12,7 +12,7 @@ import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
-import CountDownComplete from "@/components/CountDownComplete";
+import CountDownCompleteEn from "@/components/CountDownCompleteEn";
 import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
 import moment from 'moment'
 
@@ -136,7 +136,7 @@ export default function Home() {
 
   useEffect(() => {
     window.addEventListener("beforeunload", (ev) => {
-      handleOut()
+      // handleOut()
     });
     return () => {
       window.removeEventListener('beforeunload', () => { });
@@ -588,8 +588,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(shipping fee not included)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                  <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
+                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
                   Purchase
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -639,8 +639,8 @@ export default function Home() {
                       </div>
                       {startCountDown && step === 3 &&
                         <>
-                          <CountDownComplete initialMinutes={5} />
-                          <span className="text-mini italic text-red-500 text-left">(Your slot has been reserved! Please complete the payment within 5 minutes. If you don’t want to purchase, please click “Cancel”)</span>
+                          <CountDownCompleteEn initialMinutes={8 * 60} />
+                          <span className="text-mini italic text-red-500 text-left">(Your slot has been reserved! Please complete the payment within 8 hours. If you don’t want to purchase, please click “Cancel”)</span>
                         </>
                       }
                       {step < 4 && <div className="mt-4 text-center sm:mt-0 sm:text-left">
@@ -717,43 +717,43 @@ export default function Home() {
                               <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('https://paypal.me/kiras98')} />
                             </div>
                           </div>
-                          : <div>
-                            {/* <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please follow ours informations)</span> */}
-                            <div className="text-sm text-gray-500 font-semibold mt-2">
-                              <div className="flex justify-center flex-1">
-                                <img className="w-32" src="https://cdn.remitly.com/images/v1/img/remtily_logo_vertical_midnight_b.6eT0nA18TSlQIsjllF72RN.png" />
-                              </div>
-                              <div className="flex col  flex-1 ">
-                                <span>Total: </span>
-                                <span className="text-gray-900 ml-1">{toDollar(totalAmount)}</span>
-                              </div>
-                              <div className="flex col  flex-1 mt-3">
-                                <span>Delivery method: </span>
-                                <span className="text-gray-900 ml-1"> Bank deposit</span>
-                              </div>
-                              <div className="flex col flex-1 items-center mt-2">
-                                <span>Recipient's bank: </span>
-                                <div className="flex items-center rounded-sm border px-1 py-1 ml-1">
-                                  <img className="w-12" src="https://dongphucvina.vn/wp-content/uploads/2023/05/logo-techcombank-dongphucvina.vn_.png"></img>
-                                  <span className="text-gray-900 ml-1">Techcombank</span>
+                            : <div>
+                              {/* <span className="text-mini italic text-red-500 text-left">(If you use Remitly, please follow ours informations)</span> */}
+                              <div className="text-sm text-gray-500 font-semibold mt-2">
+                                <div className="flex justify-center flex-1">
+                                  <img className="w-32" src="https://cdn.remitly.com/images/v1/img/remtily_logo_vertical_midnight_b.6eT0nA18TSlQIsjllF72RN.png" />
+                                </div>
+                                <div className="flex col  flex-1 ">
+                                  <span>Total: </span>
+                                  <span className="text-gray-900 ml-1">{toDollar(totalAmount)}</span>
+                                </div>
+                                <div className="flex col  flex-1 mt-3">
+                                  <span>Delivery method: </span>
+                                  <span className="text-gray-900 ml-1"> Bank deposit</span>
+                                </div>
+                                <div className="flex col flex-1 items-center mt-2">
+                                  <span>Recipient's bank: </span>
+                                  <div className="flex items-center rounded-sm border px-1 py-1 ml-1">
+                                    <img className="w-12" src="https://dongphucvina.vn/wp-content/uploads/2023/05/logo-techcombank-dongphucvina.vn_.png"></img>
+                                    <span className="text-gray-900 ml-1">Techcombank</span>
+                                  </div>
+                                </div>
+                                <div className="flex flex-1 items-center mt-2">
+                                  <span>Recipient Bank account: </span>
+                                  <div className="flex flex-1 items-center ml-1">
+                                    <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
+                                    <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('19037257529012')} />
+                                  </div>
+                                </div>
+                                <div className="flex flex-1 items-start mt-4">
+                                  <span>Recipient name: </span>
+                                  <div className="flex flex-col items-start">
+                                    <span className="text-gray-900 ml-1">Nguyen - Danh - Khanh</span>
+                                    <span className="italic font-normal">(Family - Middle - Given)</span>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="flex flex-1 items-center mt-2">
-                                <span>Recipient Bank account: </span>
-                                <div className="flex flex-1 items-center ml-1">
-                                  <span className="text-center text-sm text-gray-900 font-semibold">19037257529012</span>
-                                  <DocumentDuplicateIcon className=" ms-1 h-5 w-5 text-gray-900 cursor-pointer" onClick={() => copy('19037257529012')} />
-                                </div>
-                              </div>
-                              <div className="flex flex-1 items-start mt-4">
-                                <span>Recipient name: </span>
-                                <div className="flex flex-col items-start">
-                                  <span className="text-gray-900 ml-1">Nguyen - Danh - Khanh</span>
-                                  <span className="italic font-normal">(Family - Middle - Given)</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>}
+                            </div>}
 
 
                           {/* <div className="flex flex-1 items-center justify-center mt-5">
