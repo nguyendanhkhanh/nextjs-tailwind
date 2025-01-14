@@ -378,7 +378,7 @@ export default function Home() {
     }
 
     if (step === 2) {
-      if (!info.ig || !info.name || !info.phone || !info.province.name || !info.district.name || !info.ward.name || !info.address) {
+      if (!info.ig || !info.name || !info.phone || !info.country || !info.countrySelect || !info.province.name || !info.district.name || !info.ward.name || !info.address) {
         return alert('Please fill in all information')
       }
       if (phoneWarning) {
@@ -542,7 +542,7 @@ export default function Home() {
     <main className="min-h-screen min-w-[375px] max-w-screen-xl bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
         <div className="cursor-pointer" onClick={() => {
-          window.location.href = 'https://amandaera.com/';
+          // window.location.href = 'https://amandaera.com/';
         }}>
           {/* <img className="w-8" src="./united-kingdom.png" /> */}
           <div className="flex align-center font-semibold">
@@ -589,7 +589,7 @@ export default function Home() {
                   <span className="text-mini italic text-start">(shipping fee not included)</span>
                 </div>
                 <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
+                  {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
                   Purchase
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
