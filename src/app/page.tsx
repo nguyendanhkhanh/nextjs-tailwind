@@ -1,7 +1,7 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/app/order-test-6666/Countdown";
+import Countdown from "@/components/Countdown";
 import OrderProductList from "@/app/order-test-6666/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
@@ -647,8 +647,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
+                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}

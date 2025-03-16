@@ -10,6 +10,7 @@ export interface ProductType {
   }[]
   price: number
   image: string
+  index: number
 }
 
 export interface CartType {

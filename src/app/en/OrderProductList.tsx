@@ -134,19 +134,38 @@ function OrderProductList(props: any) {
     }
   }, [isDone])
 
+  // const getProduct = async () => {
+  //   const res = await axios.get(HOST + '/api/product-beta?lang=en')
+  //   const data = res.data.data.map((p: any) => {
+  //     return {
+  //       ...p,
+  //       units: p.units.map((u: any) => ({
+  //         ...u,
+  //         buy: 0
+  //       }))
+  //     }
+  //   })
+  //   setProducts(data)
+  // }
+
   const getProduct = async () => {
-    const res = await axios.get(HOST + '/api/product-beta?lang=en')
-    const data = res.data.data.map((p: any) => {
-      return {
-        ...p,
-        units: p.units.map((u: any) => ({
-          ...u,
-          buy: 0
-        }))
-      }
-    })
+    const res = await axios.get(HOST + '/api/product-beta?lang=en&drop=3')
+    let data = res.data.data
+      .filter(p => p._id != '67d690dfcb2618316a635255')
+      .map((p: any) => {
+        return {
+          ...p,
+          units: p.units.map((u: any) => ({
+            ...u,
+            buy: 0
+          })),
+          index: p.name == 'Aiko top' ? 3 : p.index
+        }
+      })
+    data = data.sort((a, b) => a.index - b.index)
     setProducts(data)
   }
+
 
 
   const onChangeQuantity = (id: string, unitCode: string, quantity: number) => {
@@ -209,8 +228,8 @@ function OrderProductList(props: any) {
         ))}
       </div>
 
-      <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}>
-        {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}> */}
+      {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => onClickOrder(carts, totalPrice)}> */}
+        <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => {}}>
         Order now
         <HeartIcon className='w-4' />
       </button>
