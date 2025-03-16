@@ -24,6 +24,12 @@ export default function Home() {
   const containerRef = useRef(null);
   const bottomRef = useRef(null);
 
+  const [avaiable, setAvaiable] = useState({
+    status: false,
+    reason: 'Loading...',
+    date: ''
+  })
+
   const [isMerge, setIsMerge] = useState(false);
 
   const [deviceCode, setDeviceCode] = useState('');
@@ -93,6 +99,7 @@ export default function Home() {
 
   useEffect(() => {
     getDeviceCode()
+    checkDropAvaiable()
 
     return () => {
     }
@@ -208,6 +215,15 @@ export default function Home() {
     return () => {
     }
   }, [districts, info.district.code])
+
+  const checkDropAvaiable = async () => {
+    // verify drop avaiable
+    const res = await axios.get(HOST + '/api/order/check-order-avaiable?lang=vi')
+    if (res.data.statusCode == 200) {
+      setAvaiable(res.data.data)
+    }
+
+  }
 
 
   const getDeviceCode = async () => {
@@ -482,6 +498,12 @@ export default function Home() {
       isMerge: isMerge
     })
     const resp = res.data.data
+    if (resp.status === false) {
+      setTimeout(() => {
+        location.reload()
+      }, 3000);
+      return alert(resp.reason)
+    }
     if (resp.soldoutList.length) {
       setSoldout(resp.soldoutList)
       const newCarts = carts.filter(c => {
@@ -647,8 +669,8 @@ export default function Home() {
                 <div className="flex  justify-between px-1 text-md">
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct} onClick={() => setTrackingClickOrder(true)}> */}
-                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}>
+                <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct || !avaiable.status} onClick={() => setTrackingClickOrder(true)}>
+                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -664,8 +686,9 @@ export default function Home() {
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
-        <Countdown />
+        <Countdown avaiable={avaiable} />
         <OrderProductList
+          avaiable={avaiable}
           productRemove={productRemove}
           resetProductRemove={resetProductRemove}
           trackingClickOrder={trackingClickOrder}

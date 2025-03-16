@@ -37,7 +37,7 @@ const DialogError = (props: any) => {
 
                 <div className="bg-white px-4 py-3 flex justify-between ">
                   <button className="btn flex-1 bg-pink-100 text-gray-900" onClick={onClose}>
-                    Đồng ý
+                    Ok
                   </button>
                 </div>
               </Dialog.Panel>

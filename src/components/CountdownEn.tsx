@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
 
-export default function Countdown() {
-  const targetDate = new Date(Date.UTC(2025, 2, 18, 2, 0, 0)); // 2h sáng 18/3/2025 UTC
+export default function Countdown(props: any) {
+
+  const {
+    avaiable
+  } = props
+
   const [countDownTime, setCountDownTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const updateCountdown = () => {
       const now = new Date().getTime();
+      const targetDate = new Date(avaiable.date); // 2h sáng 18/3/2025 UTC
+
       const timeDiff = targetDate - now;
 
       if (timeDiff <= 0) {
@@ -25,13 +31,25 @@ export default function Countdown() {
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [avaiable.date]);
+
+  const getContent = () => {
+    if (!avaiable.status) {
+      if (avaiable.date > new Date().toISOString()) {
+        return <span>{avaiable.content}<br /></span>
+      } else {
+        return <span>{avaiable.reason}<br /></span>
+      }
+    } else {
+      return <span className="text-md">Order now !!</span>
+    }
+  }
 
   return (
     <div className="ae-countdown-container ">
-      March drop: Coming soon❤️‍🔥<br />
-      {/* <span className="text-md">Order now !!</span> */}
-      <div className="ae-countdown-content mt-4">
+      {getContent()}
+      {/* {avaiable.status && <span className="text-md">Order now !!</span>} */}
+      {avaiable.date && avaiable.date > new Date().toISOString() && <div className="ae-countdown-content mt-4">
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.days }}></span>
@@ -58,7 +76,7 @@ export default function Countdown() {
         </div>
         <div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

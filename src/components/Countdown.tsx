@@ -1,72 +1,55 @@
 import { useCallback, useEffect, useState } from "react";
 
-export default function Countdown() {
-  const [countDownTime, setCountDownTIme] = useState({
-    days: "00",
-    hours: "00",
-    minutes: "00",
-    seconds: "00",
-  });
+export default function Countdown(props: any) {
 
-  const startCountDown = useCallback(() => {
-    const customDate = new Date();
-    const date = new Date(2025, 3 - 1, 17, 21)
-    // date.setHours(date.getHours() - 7)
-    var intervalCoundown = setInterval(() => {
-      const countDownTime = date.getTime()
-      const currentTime = new Date().getTime();
-      const timeDiffrence = countDownTime - currentTime;
-      let days =
-        Math.floor(timeDiffrence / (24 * 60 * 60 * 1000)) >= 10
-          ? Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))
-          : `0${Math.floor(timeDiffrence / (24 * 60 * 60 * 1000))}`;
-      const hours =
-        Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)) >=
-          10
-          ? Math.floor((timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60))
-          : `0${Math.floor(
-            (timeDiffrence % (24 * 60 * 60 * 1000)) / (1000 * 60 * 60)
-          )}`;
-      const minutes =
-        Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60)) >= 10
-          ? Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))
-          : `0${Math.floor((timeDiffrence % (60 * 60 * 1000)) / (1000 * 60))}`;
-      const seconds =
-        Math.floor((timeDiffrence % (60 * 1000)) / 1000) >= 10
-          ? Math.floor((timeDiffrence % (60 * 1000)) / 1000)
-          : `0${Math.floor((timeDiffrence % (60 * 1000)) / 1000)}`;
-      if (timeDiffrence < 0) {
-        setCountDownTIme({
-          days: "00",
-          hours: "00",
-          minutes: "00",
-          seconds: "00",
-        });
-        clearInterval(intervalCoundown);
-      } else {
-        setCountDownTIme({
-          days: days.toString(),
-          hours: hours.toString(),
-          minutes: minutes.toString(),
-          seconds: seconds.toString(),
-        });
-      }
-    }, 1000);
-  }, []);
-  
-  const getTimeDifference = (countDownTime: any) => {
+  const {
+    avaiable
+  } = props
 
-  };
+  const [countDownTime, setCountDownTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
-    startCountDown();
-  }, [startCountDown]);
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const targetDate = new Date(avaiable.date); // 2h sáng 18/3/2025 UTC
+
+      const timeDiff = targetDate - now;
+
+      if (timeDiff <= 0) {
+        setCountDownTime({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      setCountDownTime({
+        days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((timeDiff / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((timeDiff / (1000 * 60)) % 60),
+        seconds: Math.floor((timeDiff / 1000) % 60),
+      });
+    };
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
+    return () => clearInterval(timer);
+  }, [avaiable.date]);
+
+  const getContent = () => {
+    if (!avaiable.status) {
+      if (avaiable.date > new Date().toISOString()) {
+        return <span>{avaiable.content}<br /></span>
+      } else {
+        return <span>{avaiable.reason}<br /></span>
+      }
+    } else {
+      return <span className="text-md">Order now !!</span>
+    }
+  }
 
   return (
     <div className="ae-countdown-container ">
-      March drop: Coming soon❤️‍🔥<br />
-      {/* <span className="text-md">Order now !!</span> */}
-      <div className="ae-countdown-content mt-4">
+      {getContent()}
+      {/* {avaiable.status && <span className="text-md">Order now !!</span>} */}
+      {avaiable.date && avaiable.date > new Date().toISOString() && <div className="ae-countdown-content mt-4">
         <div className="ae-countdown-item-container">
           <span className="ae-countdown-time">
             <span style={{ "--value": countDownTime.days }}></span>
@@ -93,8 +76,7 @@ export default function Countdown() {
         </div>
         <div>
         </div>
-      </div>
+      </div>}
     </div>
-
-  )
+  );
 }
