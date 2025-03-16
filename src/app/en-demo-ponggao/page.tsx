@@ -605,7 +605,6 @@ export default function Home() {
       </header>
 
       <div ref={containerRef} className="ae-drop-container mt-20">
-        <Countdown />
         <OrderProductList
           productRemove={productRemove}
           resetProductRemove={resetProductRemove}
