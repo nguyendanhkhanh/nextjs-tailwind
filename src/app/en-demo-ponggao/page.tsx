@@ -1,6 +1,6 @@
 'use client'
 
-import Countdown from "@/app/order-test-6666/Countdown";
+import Countdown from "@/componentsCountdown";
 import OrderProductList from "../en/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
