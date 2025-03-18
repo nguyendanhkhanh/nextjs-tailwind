@@ -450,7 +450,7 @@ export default function Home() {
       isMerge: isMerge
     })
     const resp = res.data.data
-    if (!resp.status) {
+    if (resp.status === false) {
       setTimeout(() => {
         location.reload()
       }, 3000);
