@@ -623,7 +623,7 @@ export default function Home() {
     <main className="min-h-screen min-w-[375px]  bg-gradient-to-t from-[#fbecef] to bg-pink-50 flex flex-col justify-between">
       <header className="bg-pink-50 z-50 fixed top-0 min-w-full max-w-screen-xl flex justify-between items-center px-4 py-3 text-gray-900">
         <div className="cursor-pointer" onClick={() => {
-          window.location.href = 'https://amandaera.com/en';
+          window.location.href = 'https://amandaera.com';
         }}>
           <div className="flex align-center font-semibold">
             <img className="w-8" src="./vietnam.png" />

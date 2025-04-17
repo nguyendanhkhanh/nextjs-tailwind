@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { HeartIcon } from '@heroicons/react/20/solid'
 import ProductOrder from './ProductOrder'
+import ProductPreOrder from '@/components/ProductPreOrder'
 import { CartType, CartStorageType, ProductType } from '@/interface/Product'
 import axios from 'axios'
 import { HOST } from '@/lib/config'
@@ -200,6 +201,19 @@ function OrderProductList(props: any) {
         <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
       </div>
       <div className='flex flex-col items-center'>
+        <span className='text-lg '>Pre-order</span>
+        <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
+      </div>
+
+
+
+      <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
+        {carts.filter(c => c.pre).map((c, i) => (
+          <ProductPreOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantity} />
+        ))}
+      </div>
+
+      <div className='flex flex-col items-center'>
         <span className='text-lg '>Danh sách sản phẩm</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
       </div>
@@ -211,7 +225,7 @@ function OrderProductList(props: any) {
       </div>
 
       <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct || !avaiable.status} onClick={() => onClickOrder(carts, totalPrice)}>
-      {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
+        {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
         Đặt hàng
         <HeartIcon className='w-4' />
       </button>

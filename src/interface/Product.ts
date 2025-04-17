@@ -23,6 +23,7 @@ export interface CartType {
   }[]
   price: number
   image: string
+  pre?: boolean
 }
 
 export interface CartRequest {
