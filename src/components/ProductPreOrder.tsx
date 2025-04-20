@@ -6,7 +6,7 @@ import React, { useEffect } from 'react'
 
 interface ProductOrderProps {
   product: CartType;
-  onChangeQuantity: (id: string, unitCode: string, quantity: number) => void;
+  onChangeQuantity: (id: string, unitCode: string, quantity: number) => void; // ko dung
   onUpdateQuantity: (id: string, unitCode: string, type: string, value?: number) => void
 }
 
@@ -69,6 +69,7 @@ function ProductOrder(props: ProductOrderProps) {
         container.removeChild(textElement);
       }, 500); // Phải khớp với thời gian transition của opacity trong CSS
     }, 1000);
+    // note
   }
 
 

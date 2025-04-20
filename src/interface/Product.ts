@@ -24,6 +24,7 @@ export interface CartType {
   price: number
   image: string
   pre?: boolean
+  avaiable?: boolean
 }
 
 export interface CartRequest {

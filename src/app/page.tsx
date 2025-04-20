@@ -78,6 +78,7 @@ export default function Home() {
   const [districts, setDistricts] = useState<any[]>([])
   const [wards, setWards] = useState<any[]>([])
   const [payment, setPayment] = useState('ck')
+  const [shipOption, setShipOption] = useState('all')
   const [urlQr, setUrlQr] = useState('')
   const [cartId, setCartId] = useState('')
   const cartIdRef = useRef(cartId);
@@ -244,7 +245,6 @@ export default function Home() {
 
   const getOrder = async (deviceCode: string) => {
     const res = await axios.get(HOST + '/api/order/by-device?deviceCode=' + deviceCode)
-    console.log("🚀 ~ getOrder ~ res:", res.data.data)
     const list =
       res.data.data.map((ord, index) => ({
         ...ord,
@@ -273,7 +273,8 @@ export default function Home() {
             unit: unit.code,
             quantity: unit.quantity,
             price: prod.price,
-            image: prod.image
+            image: prod.image,
+            pre: prod.pre ? true : false
           })
         }
       })
@@ -300,8 +301,8 @@ export default function Home() {
             unit: unit.code,
             quantity: unit.quantity,
             price: prod.price,
-            image: prod.image
-
+            image: prod.image,
+            pre: prod.pre ? true : false
           })
         }
       })
@@ -446,7 +447,7 @@ export default function Home() {
       if (phoneWarning) {
         return alert('Vui lòng nhập đúng số điện thoại')
       }
-      let shipValue = calculateShip(info.province.code, payment, totalPrice)
+      let shipValue = calculateShip(info.province.code, payment, totalPrice, shipOption)
       setShip(shipValue)
       let totalPriceAfterDiscount = totalPrice
       let discountValue = 0
@@ -458,7 +459,6 @@ export default function Home() {
       let depositValue = 0
       if (payment === 'cod' && totalPrice >= 500000) {
         depositValue = toRounded(totalPrice * 0.2)
-        console.log("🚀 ~ nextStep ~ depositValue:", depositValue)
       }
       setDeposite(depositValue)
       const totalAmountValue = totalPriceAfterDiscount + shipValue
@@ -494,6 +494,7 @@ export default function Home() {
       cartId: cartId,
       ship: shipValue,
       payment: payment,
+      shipOption: shipOption,
       deposite: depositValue,
       isMerge: isMerge
     })
@@ -670,7 +671,7 @@ export default function Home() {
                   <span className="text-mini italic text-start">(chưa gồm phí ship)</span>
                 </div>
                 <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={!totalProduct || !avaiable.status} onClick={() => setTrackingClickOrder(true)}>
-                {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
+                  {/* <button className="btn w-full mt-3  text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
                   Đặt hàng
                   <HeartIcon className='w-4' />
                   {/* <span className="loading loading-spinner w-4"></span> */}
@@ -732,7 +733,7 @@ export default function Home() {
                         <div className="mt-2 flex flex-col text-sm text-gray-500">
                           {carts.map((prod, i) => (
                             <div className="flex items-center justify-between" key={i}>
-                              <span >{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
+                              <span>{prod.pre && <span className="font-semibold">[PRE] </span>}{prod.name + ' size ' + prod.unit + ' '}<span className="font-semibold">(x{prod.quantity})</span></span>
                               <span className="font-semibold ms-2">{toThousand(prod.price * prod.quantity)}</span>
                             </div>
                           ))}
@@ -818,7 +819,7 @@ export default function Home() {
                         <div className="mt-2 text-center sm:mt-0 sm:text-left">
 
                           <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 mt-4">
-                            Thông tin của nàng:
+                            1. Thông tin của nàng:
                           </Dialog.Title>
                           <div className="text-gray-800">
 
@@ -857,18 +858,39 @@ export default function Home() {
                               </select>
                             </div>
 
-                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4" style={{ fontSize: '16px' }} value={info.address} onChange={(e) => setInfo({
+                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4"  value={info.address} onChange={(e) => setInfo({
                               ...info,
                               address: e.target.value
                             })} />
 
-                            <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2" style={{ fontSize: '16px' }} value={info.note} onChange={(e) => setInfo({
+                            <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2"  value={info.note} onChange={(e) => setInfo({
                               ...info,
                               note: e.target.value
                             })} />
 
+                            {carts.filter(p => p.pre).length && carts.filter(p => !p.pre).length ?
+                              <>
+                                <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 my-2">
+                                  2. Hình thức vận chuyển:
+                                </Dialog.Title>
+                                <div className=" flex flex-col justify-items-start">
+                                  <div className="flex items-center text-start">
+                                    <input type="radio" name="radio-3" className="radio me-2" value='all' checked={shipOption === 'all'} onChange={e => setShipOption('all')} />
+                                    <span className="text-sm">Đợi đồ pre-order về rồi ship chung 1 lượt</span>
+                                  </div>
+                                  <div className=" flex flex-col mt-1">
+                                    <div className="flex items-center justify-items-start">
+                                      <input type="radio" name="radio-3" className="radio me-2" value='each' checked={shipOption === 'each'} onChange={e => setShipOption('each')} />
+                                      <span className="text-sm">Ship đồ có sẵn trước, đồ pre-order sau</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </>
+
+                              : <></>}
+
                             <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 my-2">
-                              Hình thức thanh toán:
+                              {carts.filter(p => p.pre).length && carts.filter(p => !p.pre).length ? 3 : 2}. Hình thức thanh toán:
                             </Dialog.Title>
                             <div className="flex items-center justify-around">
                               <div className=" flex flex-col">
@@ -876,24 +898,28 @@ export default function Home() {
                                   <input type="radio" name="radio-1" className="radio me-2" value='ck' checked={payment === 'ck'} onChange={e => setPayment('ck')} />
                                   <span>CK full</span>
                                 </div>
-                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-4" >(phí ship {toThousand(calculateShip(info.province.code, 'ck', totalPrice))})</span>}
+                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-4" >(phí ship {toThousand(calculateShip(info.province.code, 'ck', totalPrice, shipOption))})</span>}
                               </div>
-                              <div className=" flex flex-col">
-                                <div className="flex items-center ">
-                                  <input type="radio" name="radio-1" className="radio me-2" value='cod' checked={payment === 'cod'} onChange={e => setPayment('cod')} />
-                                  <span>COD</span>
-                                </div>
-                                {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-3" >(phí ship {toThousand(calculateShip(info.province.code, 'cod', totalPrice))})</span>}
-                              </div>
+                              {carts.filter(p => p.pre).length
+                                ? <>
+                                  <span className="text-mini italic text-start w-36"  >(Hình thức thanh toán COD không khả dụng với đơn Pre-Order)</span>
+                                </>
+                                : <div className=" flex flex-col">
+                                  <div className="flex items-center ">
+                                    <input type="radio" name="radio-1" className="radio me-2" value='cod' checked={payment === 'cod'} onChange={e => setPayment('cod')} />
+                                    <span>COD</span>
+                                  </div>
+                                  {info.province.code && !isFreeship(totalPrice) && <span className="text-mini italic text-start ms-3" >(phí ship {toThousand(calculateShip(info.province.code, 'cod', totalPrice, shipOption))})</span>}
+                                </div>}
                             </div>
 
                             <div className=" flex flex-col text-gray-600 my-4">
-                              <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start">
+                              <Dialog.Title as="h3" className="font-semibold leading-6 text-gray-500 flex justify-start text-sm">
                                 Tích vào ô dưới đây nếu là đơn hàng thứ 2 và gộp đơn (nếu k bỏ qua)
                               </Dialog.Title>
-                              <label className="label flex justify-start cursor-pointer pb-0">
+                              <label className="label flex justify-start cursor-pointer pb-0 pt-0">
                                 <input type="checkbox" checked={isMerge} className="checkbox checkbox-sm checkbox-primary" onChange={e => setIsMerge(e.target.checked)} />
-                                <span className="text-base ms-2">Đơn thứ 2 + gộp đơn</span>
+                                <span className="text-sm ms-2">Đơn thứ 2 + gộp đơn</span>
                               </label>
                               <span className="text-mini italic text-start"  >(Phí ship được tính lại khi gửi tin nhắn xác nhận!)</span>
                             </div>
@@ -997,7 +1023,7 @@ export default function Home() {
                       }
                       <span className="text-md text-gray-900 font-semibold me-1 ">Danh sách sản phẩm: </span>
                       <div>{order.products.map(p => (
-                        <div key={order._id + p._id + p.unit}>- {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
+                        <div key={order._id + p._id + p.unit}>- {p.pre ? '[PRE-ORDER] ' : ''} {p.name + ' size ' + p.unit + ' '} (x{p.quantity})</div>
                       ))}</div>
                       <div className="font-semibold">Tổng tiền: {toThousand(order.totalAmount)} - {order.payment === 'cod' ? 'COD' : 'Chuyển khoản'}
                         {order.statusMessage == 0 && !isMoreThan10Minutes(order.updateAt, new Date().toISOString()) ? <button className='bg-red-500 rounded text-white p-2 ms-8' onClick={() => cancelOrderApi(order._id)}>Hủy đơn</button> : <></>}
@@ -1020,7 +1046,7 @@ export default function Home() {
       </Transition.Root>
 
       <DialogCancelOrderSuccess visible={dialogCancelOrder} />
-      <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')}  />
+      <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')} />
 
       <footer className="ae-order-footer">
         <div className="text-sm flex items-center">

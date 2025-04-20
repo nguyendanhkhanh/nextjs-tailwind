@@ -41,7 +41,7 @@ export const generateRandomString = (length: number) => {
 };
 
 
-export function calculateShip(proviceCode: string, payment: string, totalPrice = 0) {
+export function calculateShip(proviceCode: string, payment: string, totalPrice = 0, shipOption = 'all') {
   if (totalPrice >= 800000) return 0
   switch (payment) {
     case 'cod': {
@@ -59,18 +59,20 @@ export function calculateShip(proviceCode: string, payment: string, totalPrice =
       }
     }
     case 'ck': {
+      let fee = 15000
       if (proviceCode === '01') {
-        return 12000
+        fee = 12000
       } else if (proviceCode === '79' || proviceCode === '48') {
-        return 16000
+        fee = 16000
       } else if (['10', '15', '12', '11', '14', '17', '02', '08', '25', '19',
         '06',
         '04', '20', '24', '22', '31', '26', '27', '33', '30', '24', '36', '37', '35',
       ].includes(proviceCode)) {
-        return 16000
+        fee = 16000
       } else {
-        return 20000
+        fee = 20000
       }
+      return shipOption === 'all' ? fee : fee * 2
     }
     default: return 15000
 

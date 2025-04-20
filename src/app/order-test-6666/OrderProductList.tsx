@@ -186,7 +186,29 @@ function OrderProductList(props: any) {
         return product
       } else return product
     }))
+  }
 
+  const onUpdateQuantityPreOrder = (id: string, unitCode: string, type: string, value = 0) => {
+    const product = carts.find(p => p._id === id)
+    if (!product) return
+    const productQty = product.units.reduce(((acc, cur) => acc + cur.quantity), 0)
+
+    if (productQty >= 2) {
+      if (type === 'add') return eventEmitter.emit('warning' + id, id + unitCode)
+    }
+    if (productQty === 0) {
+      if (type === 'subtract') return
+    }
+    setCarts(carts.map(product => {
+      if (product._id === id) {
+        const unit = product.units.find(u => u.code === unitCode)
+        if (!unit || (type === 'subtract' && unit.quantity == 0)) {
+          return product
+        }
+        unit.quantity = type === 'add' ? unit.quantity + 1 : unit.quantity - 1
+        return product
+      } else return product
+    }))
   }
 
   const onResetCart = () => {
@@ -200,18 +222,7 @@ function OrderProductList(props: any) {
         <img className="ms-1 w-6 me-2" src="./instagram.png" />
         <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
       </div>
-      <div className='flex flex-col items-center'>
-        <span className='text-lg '>Pre-order</span>
-        <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
-      </div>
 
-
-
-      <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
-        {carts.filter(c => c.pre).map((c, i) => (
-          <ProductPreOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantity} />
-        ))}
-      </div>
 
       <div className='flex flex-col items-center'>
         <span className='text-lg '>Danh sách sản phẩm</span>
@@ -219,8 +230,19 @@ function OrderProductList(props: any) {
       </div>
 
       <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
-        {carts.map((c, i) => (
+        {carts.filter(c => !c.pre || c.avaiable).map((c, i) => (
           <ProductOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantity} />
+        ))}
+      </div>
+
+      <div className='flex flex-col items-center mt-4'>
+        <span className='text-lg '>Pre-order</span>
+        <span className='text-sm italic font-normal'>(7-10 ngày)</span>
+        <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
+      </div>
+      <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
+        {carts.filter(c => c.pre).map((c, i) => (
+          <ProductPreOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantityPreOrder} />
         ))}
       </div>
 

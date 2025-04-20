@@ -100,11 +100,11 @@ body {
 }
 
 .ae-select {
-  @apply select mt-4 select-sm rounded-sm
+  @apply select mt-4 select-sm rounded-sm text-sm
 }
 
 .ae-textarea {
-  @apply textarea textarea-sm rounded-sm w-full
+  @apply textarea textarea-sm rounded-sm w-full text-sm
 }
 
 .hiddenText {
