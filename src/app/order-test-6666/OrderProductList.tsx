@@ -226,6 +226,7 @@ function OrderProductList(props: any) {
 
       <div className='flex flex-col items-center'>
         <span className='text-lg '>Danh sách sản phẩm</span>
+        <span className='text-sm italic font-normal'>(hàng có sẵn)</span>
         <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
       </div>
 
