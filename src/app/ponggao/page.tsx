@@ -122,7 +122,7 @@ export default function OrderBeta() {
 
 
         {orderViews.map((order, index) => (<div className='mb-6 ' key={order._id}>
-          <div>STT: {order.stt} <span className="text-center text-lg text-white font-semibold">{order.products.filter(p => p.pre).length ? '[PRE-ORDER] ' + order.shipOption == 'all' ? 'Đợi đồ pre-order về rồi ship chung 1 lượt' : 'Ship đồ có sẵn trước, đồ pre-order sau' : ' '}</span></div>
+          <div>STT: {order.stt} <span className="text-center text-lg text-white font-semibold">{order.products.filter(p => p.pre).length ? ('[PRE-ORDER] ' + (order.shipOption == 'all' ? 'Đợi đồ pre-order về rồi ship chung 1 lượt' : 'Ship đồ có sẵn trước, đồ pre-order sau')) : ' '}</span></div>
           <div>{moment(order.updateAt).format('DD/MM/YYYY HH:mm')} - {order._id}</div>
           <div className='flex'>
             <span className="text-center text-lg text-white font-semibold">{order.info.phone}</span>
