@@ -223,6 +223,16 @@ function OrderProductList(props: any) {
         <a className='text-base' href='https://www.instagram.com/amanda.era__/' target='_blank'>instagram.com/amanda.era__</a>
       </div>
 
+      <div className='flex flex-col items-center mt-4'>
+        <span className='text-lg '>Pre-order</span>
+        <span className='text-sm italic font-normal'>(7-10 ngày)</span>
+        <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
+      </div>
+      <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
+        {carts.filter(c => c.pre).map((c, i) => (
+          <ProductPreOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantityPreOrder} />
+        ))}
+      </div>
 
       <div className='flex flex-col items-center'>
         <span className='text-lg '>Danh sách sản phẩm</span>
@@ -236,16 +246,7 @@ function OrderProductList(props: any) {
         ))}
       </div>
 
-      <div className='flex flex-col items-center mt-4'>
-        <span className='text-lg '>Pre-order</span>
-        <span className='text-sm italic font-normal'>(7-10 ngày)</span>
-        <span className='text-sm'>⋆ ˚｡⋆୨♡୧⋆ ˚｡⋆</span>
-      </div>
-      <div className='mt-2 grid grid-cols-2 gap-2 text-base text-xs'>
-        {carts.filter(c => c.pre).map((c, i) => (
-          <ProductPreOrder key={i} product={c} onChangeQuantity={onChangeQuantity} onUpdateQuantity={onUpdateQuantityPreOrder} />
-        ))}
-      </div>
+
 
       <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={!totalProduct || !avaiable.status} onClick={() => onClickOrder(carts, totalPrice)}>
         {/* <button className="btn w-full my-2 text-gray-900 bg-pink-150" disabled={true} onClick={() => { }}> */}
