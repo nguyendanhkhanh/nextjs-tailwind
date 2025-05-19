@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { HeartIcon } from '@heroicons/react/20/solid'
 import ProductOrder from './ProductOrder'
-import ProductPreOrder from '@/components/ProductPreOrder'
+import ProductPreOrder from '@/components/product/ProductPreOrder'
 import { CartType, CartStorageType, ProductType } from '@/interface/Product'
 import axios from 'axios'
 import { HOST } from '@/lib/config'

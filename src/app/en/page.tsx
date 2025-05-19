@@ -1,6 +1,6 @@
 'use client'
 
-import Countdown from "@/components/CountdownEn";
+import Countdown from "@/components/countdown/CountdownEn";
 import OrderProductList from "./OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
@@ -12,8 +12,8 @@ import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
-import CountDownCompleteEn from "@/components/CountDownCompleteEn";
-import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
+import CountDownCompleteEn from "@/components/countdown/CountDownCompleteEn";
+import DialogCancelOrderSuccess from "@/components/dialog/DialogCancelOrderSuccess";
 import moment from 'moment'
 
 export default function Home() {

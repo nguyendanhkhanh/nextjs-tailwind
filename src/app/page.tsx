@@ -1,8 +1,8 @@
 'use client'
 
 import Image from "next/image";
-import Countdown from "@/components/Countdown";
-import OrderProductList from "@/app/order-test-6666/OrderProductList";
+import Countdown from "@/components/countdown/Countdown";
+import OrderProductList from "@/components/product/OrderProductList";
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { DocumentDuplicateIcon, ExclamationTriangleIcon, ShoppingBagIcon, XCircleIcon, HeartIcon } from '@heroicons/react/24/outline'
@@ -13,10 +13,11 @@ import { isFreeship } from "@/lib/common";
 import eventEmitter from '@/lib/eventEmitter';
 import axios from "axios";
 import { HOST, ISSERVER } from "@/lib/config";
-import CountDownComplete from "@/components/CountDownComplete";
-import DialogCancelOrderSuccess from "@/components/DialogCancelOrderSuccess";
+import CountDownComplete from "@/components/countdown/CountDownComplete";
+import DialogCancelOrderSuccess from "@/components/dialog/DialogCancelOrderSuccess";
 import moment from 'moment'
-import DialogError from "@/components/DialogError";
+import DialogError from "@/components/dialog/DialogError";
+import DialogOrderList from "@/components/dialog/DialogOrderList";
 
 export default function Home() {
 
@@ -240,19 +241,19 @@ export default function Home() {
     }
     setDeviceCode(storedDeviceCode);
 
-    getOrder(storedDeviceCode)
+    // getOrder(storedDeviceCode)
   }
 
-  const getOrder = async (deviceCode: string) => {
-    const res = await axios.get(HOST + '/api/order/by-device?deviceCode=' + deviceCode)
-    const list =
-      res.data.data.map((ord, index) => ({
-        ...ord,
-        stt: index + 1
-      }))
-    list.reverse()
-    setOrders(list)
-  }
+  // const getOrder = async (deviceCode: string) => {
+  //   const res = await axios.get(HOST + '/api/order/by-device?deviceCode=' + deviceCode)
+  //   const list =
+  //     res.data.data.map((ord, index) => ({
+  //       ...ord,
+  //       stt: index + 1
+  //     }))
+  //   list.reverse()
+  //   setOrders(list)
+  // }
 
   const onOpenCart = (carts: CartType[], totalPrice = 0) => {
 
@@ -598,20 +599,20 @@ export default function Home() {
     document.body.removeChild(el);
   }
 
-  const isMoreThan10Minutes = (isoStringA, isoStringB) => {
-    // Chuyển chuỗi ISOString thành đối tượng Date
-    const dateA = new Date(isoStringA);
-    const dateB = new Date(isoStringB);
+  // const isMoreThan10Minutes = (isoStringA, isoStringB) => {
+  //   // Chuyển chuỗi ISOString thành đối tượng Date
+  //   const dateA = new Date(isoStringA);
+  //   const dateB = new Date(isoStringB);
 
-    // Tính khoảng cách thời gian giữa hai mốc thời gian (B - A) tính bằng mili giây
-    const timeDifference = dateB - dateA;
+  //   // Tính khoảng cách thời gian giữa hai mốc thời gian (B - A) tính bằng mili giây
+  //   const timeDifference = dateB - dateA;
 
-    // Chuyển đổi mili giây thành phút
-    const timeDifferenceInMinutes = timeDifference / (1000 * 60);
+  //   // Chuyển đổi mili giây thành phút
+  //   const timeDifferenceInMinutes = timeDifference / (1000 * 60);
 
-    // Kiểm tra nếu khoảng cách thời gian lớn hơn 10 phút
-    return timeDifferenceInMinutes > 10;
-  }
+  //   // Kiểm tra nếu khoảng cách thời gian lớn hơn 10 phút
+  //   return timeDifferenceInMinutes > 10;
+  // }
 
   const onRemoveProductInCart = (prod: any) => {
     setProductRemove(prod)
@@ -858,12 +859,12 @@ export default function Home() {
                               </select>
                             </div>
 
-                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4"  value={info.address} onChange={(e) => setInfo({
+                            <textarea placeholder="Địa chỉ chi tiết" className="ae-textarea mt-4" value={info.address} onChange={(e) => setInfo({
                               ...info,
                               address: e.target.value
                             })} />
 
-                            <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2"  value={info.note} onChange={(e) => setInfo({
+                            <textarea placeholder="Có nhắn gì cho Amanda khum nè" className="ae-textarea mt-2" value={info.note} onChange={(e) => setInfo({
                               ...info,
                               note: e.target.value
                             })} />
@@ -986,7 +987,7 @@ export default function Home() {
         </Dialog>
       </Transition.Root>
 
-      <Transition.Root show={orders.length ? true : false} as={Fragment}>
+      {/* <Transition.Root show={orders.length ? true : false} as={Fragment}>
         <Dialog as="div" className="z-10" initialFocus={cancelButtonRef} onClose={() => { }}>
           <BackgroundModal />
 
@@ -1043,7 +1044,9 @@ export default function Home() {
             </div>
           </div>
         </Dialog>
-      </Transition.Root>
+      </Transition.Root> */}
+
+      {deviceCode && <DialogOrderList deviceCode={deviceCode} />}
 
       <DialogCancelOrderSuccess visible={dialogCancelOrder} />
       <DialogError visible={camiErr ? true : false} content={camiErr} onClose={() => setCamiErr('')} />
